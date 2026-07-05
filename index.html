@@ -3,37 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bau-Tools – Prototypen</title>
+<title>Bau-Tools – Wofür brauchst du eine Ersteinschätzung?</title>
 <style>
   *{box-sizing:border-box;}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f6f7f9;color:#1c2430;line-height:1.5;}
-  header{background:#1c2430;color:#fff;padding:36px 24px 28px;}
-  header h1{margin:0 0 8px;font-size:24px;}
-  header p{margin:0;color:#c7ccd3;font-size:14px;max-width:640px;}
-  .wrap{max-width:820px;margin:0 auto;padding:28px 20px 60px;display:grid;gap:18px;}
-  a.card{display:block;background:#fff;border:1px solid #e1e4e9;border-radius:12px;padding:20px 22px;text-decoration:none;color:inherit;transition:box-shadow .15s;}
-  a.card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08);}
-  a.card h2{margin:0 0 6px;font-size:17px;color:#1f5f8b;}
-  a.card p{margin:0;font-size:13.5px;color:#5b6472;}
-  .tag{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#5b6472;background:#eef0f3;padding:2px 8px;border-radius:999px;margin-bottom:8px;}
+  header{background:#1c2430;color:#fff;padding:44px 24px 34px;text-align:center;}
+  header h1{margin:0 0 10px;font-size:26px;}
+  header p{margin:0 auto;color:#c7ccd3;font-size:14.5px;max-width:640px;}
+  .wrap{max-width:920px;margin:0 auto;padding:36px 20px 60px;}
+  .choice-grid{display:grid;gap:22px;grid-template-columns:1fr;}
+  @media (min-width:760px){.choice-grid{grid-template-columns:1fr 1fr;}}
+  a.choice{display:block;background:#fff;border:1px solid #e1e4e9;border-radius:14px;padding:28px 26px;text-decoration:none;color:inherit;transition:box-shadow .15s, transform .15s;}
+  a.choice:hover{box-shadow:0 8px 24px rgba(0,0,0,0.10);transform:translateY(-2px);}
+  .icon{font-size:34px;margin-bottom:12px;}
+  a.choice h2{margin:0 0 8px;font-size:19px;}
+  a.choice p{margin:0 0 14px;font-size:13.5px;color:#5b6472;}
+  .examples{font-size:12.5px;color:#7c8492;}
+  .card-industrie h2{color:#1f5f8b;}
+  .card-privat h2{color:#1e7a3c;}
+  .btn-go{display:inline-block;margin-top:14px;font-size:13px;font-weight:700;color:#fff;padding:7px 14px;border-radius:7px;}
+  .card-industrie .btn-go{background:#1f5f8b;}
+  .card-privat .btn-go{background:#2a7a5e;}
+  footer{max-width:920px;margin:0 auto;padding:0 20px 50px;font-size:12px;color:#8991a0;}
 </style>
 </head>
 <body>
 <header>
-  <h1>Bau-Tools – Prototypen</h1>
-  <p>Kleine Werkzeuge rund um Bauvorhaben, gebaut zum Testen und Ausprobieren. Kein Ersatz für eine fachliche Prüfung durch Tragwerksplaner, Architekt oder Bauamt.</p>
+  <h1>Bau-Tools – Ersteinschätzung für dein Bauvorhaben</h1>
+  <p>Kein Ersatz für eine fachliche Prüfung durch Tragwerksplaner, Architekt oder Bauamt – aber ein guter erster Überblick, was auf dich zukommt und wen du dafür brauchst.</p>
 </header>
 <div class="wrap">
-  <a class="card" href="umbau-machbarkeitscheck.html">
-    <span class="tag">Industrie / Bestand</span>
-    <h2>Umbau/Anbau Machbarkeits-Check – Produktionsstandort</h2>
-    <p>Ersteinschätzung für Umbauten und Anbauten an Bestandsgebäuden im laufenden Produktionsbetrieb.</p>
-  </a>
-  <a class="card" href="bauvorhaben-regel-check.html">
-    <span class="tag">Privat / Zuhause</span>
-    <h2>Bauvorhaben Regel-Check – für Zuhause & Garten</h2>
-    <p>Ersteinschätzung für Wanddurchbruch, Dachausbau, Gartenhaus, Carport, Terrasse, Pool, PV-Anlage oder Anbau.</p>
-  </a>
+  <p style="text-align:center;font-weight:600;margin:0 0 22px;color:#3a4250;">Worum geht es bei deinem Vorhaben?</p>
+  <div class="choice-grid">
+    <a class="choice card-industrie" href="industrie.html">
+      <div class="icon">🏭</div>
+      <h2>Industrie- / Gewerbebau</h2>
+      <p>Um- oder Neubau an einem Produktions- oder Betriebsstandort, laufender Betrieb, technische Anlagen.</p>
+      <div class="examples">z. B. Wanddurchbruch in einer Halle, Kranbahn, neue Halle, PV-Anlage, Gefahrstofflager …</div>
+      <span class="btn-go">Weiter zum Industriebau →</span>
+    </a>
+    <a class="choice card-privat" href="privat.html">
+      <div class="icon">🏡</div>
+      <h2>Privates Bauvorhaben</h2>
+      <p>Umbauten, Anbauten oder Anlagen rund um dein Zuhause und Grundstück.</p>
+      <div class="examples">z. B. Wand entfernen, Dachausbau, Gartenhaus, Carport, Pool, PV-Anlage, Anbau …</div>
+      <span class="btn-go">Weiter zum Hausbau →</span>
+    </a>
+  </div>
 </div>
+<footer>Diese Tools ersetzen keine Rechts- oder Fachberatung. Angaben ohne Gewähr, Regeln unterscheiden sich je Bundesland, Kommune und Einzelfall.</footer>
 </body>
 </html>
