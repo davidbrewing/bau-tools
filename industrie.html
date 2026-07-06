@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Industrie-/Gewerbebau – Bau-Tools</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --border:#e1e4e9; --text:#1c2430; --muted:#5b6472;
+    --accent:#1f5f8b; --accent-dark:#164a6e; --accent-light:#e7f0f6;
+    --ok:#1e7a3c; --ok-bg:#e7f5eb; --warn:#9a6400; --warn-bg:#fdf3dc; --risk:#a4222c; --risk-bg:#fbe9ea;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;}
+  header{background:var(--accent);color:#fff;padding:26px 24px 20px;}
+  header h1{margin:0 0 6px;font-size:21px;}
+  header p{margin:0;color:#dbe8f0;font-size:13.5px;max-width:760px;}
+  a.home-link{color:#dbe8f0;font-size:12.5px;text-decoration:none;}
+  a.home-link:hover{text-decoration:underline;}
+  .wrap{max-width:980px;margin:0 auto;padding:22px 20px 60px;}
+  .breadcrumb{font-size:12.5px;color:var(--muted);margin-bottom:18px;}
+  .breadcrumb a{color:var(--accent);text-decoration:none;cursor:pointer;}
+  .breadcrumb a:hover{text-decoration:underline;}
+  .breadcrumb .sep{margin:0 6px;color:#c3c9d1;}
+  h2.step-title{font-size:19px;margin:0 0 6px;}
+  p.step-sub{margin:0 0 20px;color:var(--muted);font-size:13.5px;}
+  .grid{display:grid;gap:16px;grid-template-columns:1fr;}
+  @media (min-width:640px){.grid{grid-template-columns:1fr 1fr;}}
+  @media (min-width:960px){.grid.cat-grid{grid-template-columns:repeat(3,1fr);}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;transition:box-shadow .15s, transform .15s;}
+  .card:hover{box-shadow:0 6px 18px rgba(0,0,0,0.08);transform:translateY(-1px);}
+  .card h3{margin:0 0 6px;font-size:15.5px;color:var(--accent);}
+  .card p{margin:0;font-size:13px;color:var(--muted);}
+  .detail-panel{display:grid;gap:20px;grid-template-columns:1fr;}
+  @media (min-width:900px){.detail-panel{grid-template-columns:1.1fr 1fr;}}
+  .panel-box{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;}
+  .panel-box h3{margin:0 0 6px;font-size:16px;}
+  .panel-box .intro{font-size:13.5px;color:var(--muted);margin:0 0 16px;}
+  fieldset{border:none;padding:0;margin:0 0 16px;}
+  legend{font-weight:600;font-size:13.5px;margin-bottom:6px;padding:0;}
+  label.field-label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;}
+  select,input[type=text],input[type=number]{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13.5px;font-family:inherit;background:#fff;color:var(--text);}
+  .hint{font-size:12px;color:var(--muted);margin:4px 0 0;}
+  .status-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:8px;}
+  .status-ok{background:var(--ok-bg);color:var(--ok);}
+  .status-warn{background:var(--warn-bg);color:var(--warn);}
+  .status-risk{background:var(--risk-bg);color:var(--risk);}
+  .result-block{border:1px solid var(--border);border-radius:9px;padding:13px 15px;margin-bottom:11px;}
+  .result-block h4{margin:0 0 5px;font-size:14px;}
+  .result-block p{margin:0;font-size:13px;color:#31394a;}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 0;}
+  .chip{background:var(--accent-light);color:var(--accent-dark);font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;}
+  ul.tasklist{margin:6px 0 0;padding-left:18px;}
+  ul.tasklist li{font-size:13px;margin-bottom:5px;}
+  .plz-box{margin-top:8px;}
+  .plz-row{display:flex;gap:8px;margin-top:6px;}
+  .plz-row input{flex:1;}
+  button{cursor:pointer;font-family:inherit;}
+  button.primary{background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:600;}
+  button.primary:hover{background:var(--accent-dark);}
+  .fachplaner-box{margin-top:14px;background:#fafbfc;border:1px solid var(--border);border-radius:9px;padding:12px 14px;}
+  .fachplaner-box h4{margin:0 0 8px;font-size:13.5px;}
+  .firm-card{border:1px solid var(--border);border-radius:7px;padding:8px 10px;margin-bottom:8px;background:#fff;}
+  .firm-card .role{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:700;}
+  .firm-card .name{font-size:13.5px;font-weight:600;margin:2px 0;}
+  .firm-card a{font-size:12.5px;color:var(--accent);}
+  .disclaimer-small{font-size:11.5px;color:var(--muted);margin-top:8px;}
+  .disclaimer{font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:16px;padding-top:12px;}
+  .placeholder{color:var(--muted);font-size:13.5px;}
+</style>
+</head>
+<body>
+<header>
+  <p style="margin-bottom:8px;"><a class="home-link" href="index.html">← Zur Startseite</a></p>
+  <h1>Industrie- / Gewerbebau</h1>
+  <p>Ersteinschätzung für Um- und Neubauten sowie technische Anlagen an Produktions- und Betriebsstandorten. Ersetzt keine Prüfung durch Tragwerksplaner, Architekt oder Bauamt.</p>
+</header>
+<div class="wrap" id="app"></div>
+
+<script>
+const FACHPLANER_DB = {
+  '0': {region:'Raum Dresden / Sachsen, Thüringen', tragwerksplaner:{name:'PENZL. Ingenieure Tragwerksplanung GmbH', website:'https://www.penzl-ingenieure.de/'}, architekt:{name:'drauschke & fliegel Architektur', website:'https://www.drauschkefliegel.de/'}},
+  '1': {region:'Raum Berlin / Brandenburg', tragwerksplaner:{name:'LOSSEN INGENIEURE GmbH', website:'https://www.lossen-ingenieure.de/'}, architekt:{name:'AMB-Architekten Machka', website:'https://amb-machka.jimdoweb.com/industriebau/'}},
+  '2': {region:'Raum Hamburg / Schleswig-Holstein, Bremen', tragwerksplaner:{name:'NAi Nagaraj Ingenieure', website:'https://www.nagaraj-ingenieure.de/'}, architekt:{name:'Architekturbüro Herzog & Söchtig', website:'https://www.architekt-hamburg.com/industriebau/'}},
+  '3': {region:'Raum Hannover / Niedersachsen', tragwerksplaner:{name:'shl ingenieure GmbH', website:'https://shl-ing.com/'}, architekt:{name:'Architekt Pielhop', website:'http://www.pielhop.de/'}},
+  '4': {region:'Raum Dortmund / Ruhrgebiet', tragwerksplaner:{name:'Cramer Engineering', website:'https://cramer-engineering.de/'}, architekt:{name:'SHA Scheffler Helbich Architekten', website:'https://sha.de/'}},
+  '5': {region:'Raum Köln / Rheinland', tragwerksplaner:{name:'Ingenieurbüro Grobecker GmbH', website:'https://grobecker.koeln/'}, architekt:{name:'frerichsarchitektur', website:'https://frerichsarchitektur.de/projekte/architekt-industriebau-gewerbebau/'}},
+  '6': {region:'Raum Frankfurt / Hessen', tragwerksplaner:{name:'jmquadrat', website:'https://jmquadrat.de/'}, architekt:{name:'Architekten Michel', website:'https://www.architekten-michel.de/expertise/industrie-und-gewerbebauten/'}},
+  '7': {region:'Raum Stuttgart / Baden-Württemberg', tragwerksplaner:{name:'tragwerk-s', website:'https://www.tragwerk-s.de/'}, architekt:{name:'Neugebauer + Rösch Architekten', website:'https://neugebauer-roesch.pxcld.com/architekt-fuer-industriebau.html'}},
+  '8': {region:'Raum München / Bayern-Süd', tragwerksplaner:{name:'BERT Ingenieure GmbH & Co. KG', website:'https://bert-ingenieure.de/'}, architekt:{name:'Bottler Lutz Architekten', website:'https://www.bottler-lutz.de/industrie-und-logistik/'}},
+  '9': {region:'Raum Nürnberg / Bayern-Nord', tragwerksplaner:{name:'Ingenieurquadrat Part mbB', website:'https://www.ing2.de/'}, architekt:{name:'Wagner + Nenadovic Architekten', website:'http://www.wagner-nenadovic-architekten.de/'}}
+};
+
+function block(level,title,text){return {level,title,text};}
+
+const KATEGORIEN = [
+  {
+    id:'umbau', title:'Umbau im Bestand', icon:'🔧',
+    desc:'Eingriffe in eine bestehende Halle oder ein bestehendes Betriebsgebäude, meist im laufenden Betrieb.',
+    massnahmen:[
+      {
+        id:'wand-einreissen', title:'Wand einreißen / Wanddurchbruch', roles:['tragwerksplaner'],
+        intro:'Entfernen oder Durchbrechen einer Innen- oder Außenwand, z. B. um Flächen zusammenzulegen oder Materialfluss zu verbessern.',
+        dynamic:{
+          field:{id:'tragend', label:'Ist die Wand vermutlich tragend?', options:[['unsicher','Unsicher'],['ja','Ja'],['nein','Nein']]},
+          blocks:function(v){
+            const out=[];
+            if(v.tragend==='ja') out.push(block('risk','Tragende Wand','Ein Standsicherheitsnachweis durch einen Tragwerksplaner ist zwingend erforderlich, meist inklusive Interimsabstützung während der Bauphase.'));
+            else if(v.tragend==='nein') out.push(block('ok','Nicht tragende Wand','Geringeres statisches Risiko. Trotzdem vor dem Abriss auf Leitungen und Installationen in der Wand achten.'));
+            else out.push(block('warn','Tragende Wand – unklar','Ohne Bestandsunterlagen oder Vor-Ort-Prüfung lässt sich das nicht sicher beurteilen. Tragwerksplaner vor Beginn hinzuziehen.'));
+            out.push(block('warn','Brandabschnitte','Wände in Hallen sind oft Teil von Brand- oder Rauchabschnitten. Ein Durchbruch kann das Brandschutzkonzept berühren – im Zweifel Brandschutzplaner einbinden.'));
+            out.push(block('warn','Weiterbetrieb','Bauablauf mit dem laufenden Betrieb abstimmen (Lärm, Staub, Zugänglichkeit) – ggf. außerhalb der Schicht oder am Wochenende arbeiten lassen.'));
+            return out;
+          }
+        },
+        fachleute:['Tragwerksplaner (bauvorlageberechtigt)','Brandschutzplaner (bei Brandabschnitt)','Fachbetrieb Abbruch'],
+        nextSteps:['Bestandspläne/Statik sichten','Tragwerksplaner beauftragen','Genehmigungspflicht beim Bauamt klären','Bauablauf mit dem Betrieb abstimmen']
+      },
+      {
+        id:'tor-einbau', title:'Einbau eines Tores/einer Tür in eine Wand', roles:['tragwerksplaner'],
+        intro:'Neue Öffnung für Anlieferung, Stapler- oder Kranverkehr in einer bestehenden Wand.',
+        blocks:[
+          block('risk','Statik der Restwand','Ein neuer Wandausschnitt braucht in der Regel einen Sturz oder Unterzug – die Reststandsicherheit muss ein Tragwerksplaner nachweisen.'),
+          block('warn','Brandschutz/Rauchabschnitt','Ist die Wand ein Brandabschnitt, können für das neue Tor Feuerwiderstand (z. B. T30/T90) oder automatische Schließmechanismen vorgeschrieben sein.'),
+          block('warn','Bauordnungsrecht','Eine neue Öffnung in einer Außenwand kann Abstandsflächen oder die Fassadengestaltung berühren und ist oft anzeige- oder genehmigungspflichtig.'),
+          block('ok','Reine Ersatzmaßnahme','Bei gleicher Größe/Position wie ein vorhandenes Tor ist das Risiko meist geringer – trotzdem beim Bauamt nachfragen.')
+        ],
+        fachleute:['Tragwerksplaner','Brandschutzplaner (falls relevant)','Fachbetrieb Tor-/Stahlbau'],
+        nextSteps:['Position und Größe festlegen','Tragwerksplaner für Sturz/Unterzug beauftragen','Brandschutz-Relevanz klären','Genehmigungspflicht beim Bauamt erfragen']
+      },
+      {
+        id:'bodenplatte-oeffnen', title:'Öffnung der Bodenplatte für eine Gerätschaft', roles:['tragwerksplaner'],
+        intro:'Z. B. für das Fundament einer neuen Maschine, eine Grube oder eine Leitungsdurchführung.',
+        blocks:[
+          block('risk','Tragfähigkeit & Bewehrung','Bodenplatten sind oft bewehrt und tragen Lasten (Regale, Maschinen). Durchtrennte Bewehrung kann die Tragfähigkeit beeinträchtigen – vorher Bestandsunterlagen/Statik prüfen lassen.'),
+          block('warn','Leitungen im Boden','Vor jeder Kernbohrung oder Aufsägung eine Leitungssuche (Elektro, Wasser, Abwasser, Druckluft) durchführen lassen.'),
+          block('warn','Abdichtung/Feuchteschutz','Je nach Nutzung (Grube, Fundament unterhalb der Platte) kann eine neue Abdichtung gegen Bodenfeuchte nötig werden.'),
+          block('ok','Genehmigung','Reine Eingriffe in die Bodenplatte innerhalb der Halle sind oft nicht separat genehmigungspflichtig – im Zweifel beim Bauamt nachfragen.')
+        ],
+        fachleute:['Tragwerksplaner','Leitungsortung/Fachbetrieb','ggf. Bodengutachter'],
+        nextSteps:['Bestandsunterlagen zur Bodenplatte sichten','Leitungssuche beauftragen','Tragwerksplaner zur Freigabe der Öffnung einbinden']
+      },
+      {
+        id:'fassade-umbau', title:'Fassade öffnen/umbauen', roles:['tragwerksplaner','architekt'],
+        intro:'Neue Fenster, Tore, Fluchttüren oder eine komplette Fassadenerneuerung.',
+        blocks:[
+          block('risk','Tragende Fassadenelemente','Bei tragenden Stützen/Riegeln in der Fassade ist für neue Öffnungen ein Tragwerksplaner zwingend erforderlich.'),
+          block('warn','Wärme-/Brandschutz','Neue Fassadenelemente müssen aktuelle energetische Anforderungen (GEG) und ggf. Brandschutzvorgaben erfüllen.'),
+          block('warn','Genehmigung/Gestaltung','Fassadenänderungen sind meist genehmigungs- oder anzeigepflichtig, besonders bei verändertem äußerem Erscheinungsbild oder in Gebieten mit Gestaltungssatzung.'),
+          block('ok','Kleine Ersatzmaßnahmen','Ein reiner 1:1-Austausch (gleiche Größe/Position) ist oft einfacher genehmigungsfähig.')
+        ],
+        fachleute:['Tragwerksplaner','Architekt/Bauvorlageberechtigter','Fachbetrieb Fassadenbau'],
+        nextSteps:['Bestandsstatik der Fassade prüfen lassen','Architekt/Tragwerksplaner einbinden','Genehmigungspflicht beim Bauamt klären']
+      },
+      {
+        id:'thermische-sanierung', title:'Thermische Sanierung (Dach/Fassade)', roles:['tragwerksplaner'],
+        intro:'Energetische Ertüchtigung von Dach oder Fassade, z. B. durch neue Dämmung.',
+        blocks:[
+          block('warn','GEG-Anforderungen','Bei größeren Sanierungen greifen ab einem bestimmten Flächenanteil Mindestanforderungen des Gebäudeenergiegesetzes an den U-Wert.'),
+          block('warn','Zusatzlast auf Dach/Fassade','Neue Dämmung/Bekleidung erhöht das Gewicht der Konstruktion – bei älteren Hallen die Tragfähigkeit der Unterkonstruktion prüfen lassen.'),
+          block('warn','Brandschutz Dämmstoff','Bei Hallen mit besonderen Anforderungen (z. B. Lager) auf die Baustoffklasse der Dämmung achten.'),
+          block('ok','Förderung','Energetische Sanierungen an Nichtwohngebäuden können unter bestimmten Voraussetzungen gefördert werden (z. B. BEG/KfW) – vor Beauftragung prüfen.')
+        ],
+        fachleute:['Energieberater','Tragwerksplaner (bei Zusatzlast)','Fachbetrieb Dach/Fassade'],
+        nextSteps:['Energieberatung/Bestandsaufnahme einholen','Tragfähigkeit der Unterkonstruktion prüfen lassen','Fördermöglichkeiten recherchieren']
+      },
+      {
+        id:'pv-anlage', title:'Installation einer PV-Anlage auf dem Hallendach', roles:['tragwerksplaner'],
+        intro:'Photovoltaik auf dem Dach oder als Freiflächenanlage auf dem Betriebsgelände.',
+        dynamic:{
+          field:{id:'dachzustand', label:'Baujahr/Zustand des Dachstuhls bekannt und tragfähig geprüft?', options:[['unsicher','Unsicher / nicht geprüft'],['ja','Ja, geprüft und tragfähig']]},
+          blocks:function(v){
+            const out=[];
+            if(v.dachzustand==='unsicher') out.push(block('warn','Tragfähigkeit des Dachs','PV-Module erhöhen die Dachlast dauerhaft (Eigengewicht plus ggf. höhere Schneelast-Anfälligkeit). Bei ungeprüftem oder älterem Dach die Tragfähigkeit vor Montage von einem Tragwerksplaner/Fachbetrieb gegenchecken lassen.'));
+            else out.push(block('ok','Tragfähigkeit des Dachs','Dachstuhl als tragfähig eingeschätzt – geringeres Risiko.'));
+            out.push(block('ok','Genehmigung Dachanlage','Dachmontage ist in den meisten Bundesländern verfahrensfrei. Bei Denkmalschutz oder Gestaltungsvorgaben zur Dachfläche gelten trotzdem Sonderregeln.'));
+            out.push(block('warn','Elektrischer Anschluss','Größere Anlagen benötigen eine Anmeldung beim Netzbetreiber und ggf. eine Anpassung des Anschlusses – frühzeitig klären.'));
+            return out;
+          }
+        },
+        fachleute:['Tragwerksplaner oder Fachbetrieb Dach','Elektrofachbetrieb/PV-Fachbetrieb'],
+        nextSteps:['Tragfähigkeit des Dachs klären lassen','Netzbetreiber frühzeitig kontaktieren','PV-Fachbetrieb für Planung/Montage beauftragen']
+      },
+      {
+        id:'kranbahn', title:'Einbau/Verstärkung einer Kranbahn', roles:['tragwerksplaner'],
+        intro:'Neue oder verstärkte Kranbahn für den innerbetrieblichen Materialtransport.',
+        blocks:[
+          block('risk','Zusätzliche Lasten','Kranbahnen erzeugen hohe, oft wechselnde Lasten auf Stützen und Fundamente – ein Tragwerksplaner muss die Bestandskonstruktion nachrechnen.'),
+          block('warn','Prüfpflicht der Krananlage','Krananlagen unterliegen eigenen Prüf- und Zulassungspflichten (u. a. durch eine zugelassene Überwachungsstelle), unabhängig vom Baurecht.'),
+          block('warn','Genehmigung','Je nach Umfang (neue Kranbahnstützen, Änderung der Hallenkonstruktion) kann eine Baugenehmigung erforderlich sein.')
+        ],
+        fachleute:['Tragwerksplaner (Erfahrung mit Kranbahnen)','Sachverständiger für Krananlagen','Fachbetrieb Stahlbau'],
+        nextSteps:['Bestandsstatik der Halle sichten','Tragwerksplaner beauftragen','Abstimmung mit Kranhersteller/Prüforganisation']
+      },
+      {
+        id:'sozialraeume', title:'Einbau von Sozial-/Büroflächen (Mezzanine)', roles:['tragwerksplaner','architekt'],
+        intro:'Zusätzliche Ebene oder Container-Lösung für Büro- oder Pausenräume innerhalb der Halle.',
+        blocks:[
+          block('risk','Nutzungsänderung','Aus Lager-/Produktionsfläche wird Aufenthaltsraum – das löst Anforderungen an Fluchtwege, Belichtung, Brandschutz und Arbeitsstättenrichtlinie aus.'),
+          block('warn','Zusätzliche Geschossdecke','Eine Mezzanine-Ebene bedeutet zusätzliche Lasten und meist eine neue Deckenkonstruktion – Tragwerksplaner erforderlich.'),
+          block('warn','Arbeitsstättenverordnung','Für Büro-/Sozialräume gelten eigene Anforderungen an Raumhöhe, Belüftung, Sanitärausstattung und Fluchtweglänge.')
+        ],
+        fachleute:['Tragwerksplaner','Architekt','Fachplaner Arbeitsstätten/Brandschutz'],
+        nextSteps:['Nutzungskonzept mit Arbeitsstättenrichtlinie abgleichen','Brandschutzkonzept anpassen lassen','Bauantrag für Nutzungsänderung prüfen']
+      },
+      {
+        id:'deckendurchbruch', title:'Deckendurchbruch für Förderanlage/Aufzug', roles:['tragwerksplaner'],
+        intro:'Öffnung einer Geschossdecke für eine Förderanlage, einen Aufzug oder Materialschacht.',
+        blocks:[
+          block('risk','Tragwerk der Decke','Durchbrüche in Geschossdecken erfordern immer einen statischen Nachweis und oft zusätzliche Unterzüge/Verstärkungen.'),
+          block('warn','Brandschutz zwischen Geschossen','Deckenöffnungen können Brandabschnitte zwischen Geschossen aufheben – Abschottung/Kompensation mit Brandschutzplaner klären.'),
+          block('warn','Aufzugsrichtlinie','Bei Aufzügen/Förderanlagen gelten zusätzlich produktspezifische Sicherheits- und Prüfvorschriften.')
+        ],
+        fachleute:['Tragwerksplaner','Brandschutzplaner','Fachplaner Fördertechnik'],
+        nextSteps:['Statische Voruntersuchung durchführen lassen','Brandschutzkonzept ergänzen','Anbieter der Förderanlage frühzeitig einbinden']
+      },
+      {
+        id:'explosionsschutz', title:'Explosionsschutzrelevanter Umbau (ATEX-Zonen)', roles:['tragwerksplaner'],
+        intro:'Bauliche Änderungen in oder an Bereichen mit brennbaren Stäuben, Gasen oder Dämpfen.',
+        blocks:[
+          block('risk','Ex-Zonen-Einteilung','Bauliche Änderungen in Ex-gefährdeten Bereichen erfordern eine (neue) Zonen-Einteilung nach Betriebssicherheitsverordnung/ATEX.'),
+          block('risk','Explosionsschutzdokument','Änderungen müssen im Explosionsschutzdokument nachgeführt werden – ein Fachplaner für Explosionsschutz ist meist zwingend einzubinden.'),
+          block('warn','BImSchG-Relevanz','Je nach Anlage/Stoffmenge kann zusätzlich eine immissionsschutzrechtliche Genehmigung (4. BImSchV) relevant werden.')
+        ],
+        fachleute:['Fachplaner Explosionsschutz','Tragwerksplaner','ggf. Gutachter nach BetrSichV'],
+        nextSteps:['Bestehendes Explosionsschutzdokument prüfen/aktualisieren lassen','Fachplaner Ex-Schutz frühzeitig einbinden','Genehmigungspflicht mit Bauamt/Gewerbeaufsicht klären']
+      },
+      {
+        id:'fluchtwege', title:'Änderung der Fluchtwege / des Brandschutzkonzepts', roles:['architekt'],
+        intro:'Änderung der Wegführung, z. B. wegen Umbau oder geänderter Nutzung.',
+        blocks:[
+          block('risk','Bestehendes Brandschutzkonzept','Jede Änderung an Fluchtwegen (Länge, Breite, Anzahl) muss mit dem bestehenden oder neu zu erstellenden Brandschutzkonzept abgeglichen werden.'),
+          block('warn','Kennzeichnung/Beleuchtung','Neue Wegführung erfordert meist neue Rettungswegkennzeichnung, Sicherheitsbeleuchtung und Abstimmung mit der Feuerwehr.'),
+          block('warn','Genehmigung','Änderungen am Rettungswegkonzept sind in der Regel genehmigungspflichtig.')
+        ],
+        fachleute:['Brandschutzplaner/Sachverständiger','Architekt'],
+        nextSteps:['Brandschutzplaner frühzeitig einbinden','Abstimmung mit der örtlichen Feuerwehr','Bauantrag/Anzeige vorbereiten']
+      }
+    ]
+  },
+  {
+    id:'neubau', title:'Neubau & Erweiterung', icon:'🏗️',
+    desc:'Neue Gebäude oder zusätzliche Flächen auf dem Betriebsgelände.',
+    massnahmen:[
+      {
+        id:'neue-halle', title:'Neue Halle auf unbebautem Grundstück', roles:['tragwerksplaner','architekt'],
+        intro:'Kompletter Hallenneubau auf einem bisher unbebauten Grundstücksteil.',
+        blocks:[
+          block('risk','Vollständiges Genehmigungsverfahren','Ein Hallenneubau durchläuft praktisch immer ein reguläres Baugenehmigungsverfahren mit Bauvorlageberechtigtem, Tragwerksplaner und ggf. weiteren Fachplanern.'),
+          block('warn','Bebauungsplan/GRZ','Zulässige Grundfläche, Höhe und Abstandsflächen ergeben sich meist aus dem Bebauungsplan des Gewerbegebiets.'),
+          block('warn','Erschließung','Anschluss an Straße, Wasser/Abwasser, Strom und Löschwasserversorgung frühzeitig mit den Versorgern klären.'),
+          block('warn','BImSchG','Je nach künftiger Nutzung (Produktionsprozesse, Lager) kann eine immissionsschutzrechtliche Genehmigung statt/parallel zur Baugenehmigung nötig sein.')
+        ],
+        fachleute:['Architekt/Bauvorlageberechtigter','Tragwerksplaner','Fachplaner TGA','ggf. Brandschutzplaner'],
+        nextSteps:['Bebauungsplan und Erschließungssituation prüfen','Architekten-/Generalplaner-Vergabe','Vorabstimmung mit dem Bauamt (Bauvoranfrage)']
+      },
+      {
+        id:'hallenerweiterung', title:'Anbau/Erweiterung einer bestehenden Halle', roles:['tragwerksplaner','architekt'],
+        intro:'Zusätzliche Fläche direkt an eine vorhandene Halle angebaut.',
+        blocks:[
+          block('risk','Anschluss an die Bestandskonstruktion','Der neue Bauteil muss statisch und bauphysikalisch sauber an die Bestandshalle angeschlossen werden (Fugen, Lastabtragung).'),
+          block('warn','Bebauungsplan/Abstandsflächen','Zusätzliche Fläche kann die Grundflächenzahl oder Abstandsflächen zum Nachbargrundstück berühren.'),
+          block('warn','Weiterbetrieb','Bauablauf mit dem laufenden Betrieb abstimmen (Zufahrten, Lärm, Anlieferung).')
+        ],
+        fachleute:['Architekt','Tragwerksplaner'],
+        nextSteps:['Bestandsunterlagen der Halle sichten','Architekt/Tragwerksplaner für Anschlussdetail beauftragen','Genehmigungspflicht beim Bauamt klären']
+      },
+      {
+        id:'aufstockung', title:'Aufstockung eines Bestandsgebäudes', roles:['tragwerksplaner','architekt'],
+        intro:'Zusätzliches Geschoss auf einem bestehenden Gebäude.',
+        blocks:[
+          block('risk','Tragfähigkeit der Bestandskonstruktion','Ob das bestehende Tragwerk (Fundamente, Stützen) eine zusätzliche Ebene trägt, muss ein Tragwerksplaner rechnerisch nachweisen.'),
+          block('warn','Höhenbeschränkungen','Bebauungsplan oder Abstandsflächenrecht können die zulässige Gebäudehöhe begrenzen.'),
+          block('warn','Brandschutz/Fluchtwege','Ein zusätzliches Geschoss kann neue Anforderungen an Fluchtwege und Brandabschnitte auslösen.')
+        ],
+        fachleute:['Tragwerksplaner','Architekt','Brandschutzplaner'],
+        nextSteps:['Statisches Gutachten zur Aufstockungsfähigkeit einholen','Architekt für Entwurf/Bauantrag beauftragen','Brandschutzkonzept anpassen lassen']
+      },
+      {
+        id:'buerogebaeude', title:'Neubau Verwaltungs-/Bürogebäude', roles:['tragwerksplaner','architekt'],
+        intro:'Eigenständiges Bürogebäude auf dem Betriebsgelände.',
+        blocks:[
+          block('ok','Regulärer Hochbau','Ein Bürogebäude folgt im Kern den normalen Regeln des Hochbaus (Baugenehmigung, Arbeitsstättenrichtlinie) und ist planerisch meist unkomplizierter als ein Hallenneubau.'),
+          block('warn','Bebauungsplan Gewerbegebiet','Nutzungsart und zulässiger Büroanteil können im Bebauungsplan für Gewerbe-/Industriegebiete eingeschränkt sein.'),
+          block('warn','Stellplätze','Für Büronutzung sind meist mehr Stellplätze je m² erforderlich als für Hallenflächen – Stellplatzsatzung prüfen.')
+        ],
+        fachleute:['Architekt','Tragwerksplaner','Fachplaner TGA'],
+        nextSteps:['Bebauungsplan zur zulässigen Nutzung prüfen','Architekt beauftragen','Stellplatznachweis einplanen']
+      },
+      {
+        id:'nebengebaeude', title:'Neubau technisches Nebengebäude', roles:['tragwerksplaner','architekt'],
+        intro:'Z. B. Trafostation, Gefahrstofflager oder Kompressorhaus.',
+        blocks:[
+          block('risk','Sonderbau-Anforderungen','Je nach Inhalt (Gefahrstoffe, Druckluft, Elektrik) gelten oft besondere Anforderungen, z. B. Abstandsflächen, Brandschutz, Auffangwannen.'),
+          block('warn','Genehmigung/BImSchG','Je nach Lagermenge/Stoffart kann zusätzlich zur Baugenehmigung eine immissions- oder wasserrechtliche Genehmigung nötig sein.'),
+          block('warn','Abstände zu Nachbarbebauung','Gefahrstofflager und Trafostationen unterliegen oft Mindestabständen zu Gebäuden/Grundstücksgrenzen.')
+        ],
+        fachleute:['Architekt/Fachplaner für den Anlagentyp','Tragwerksplaner','Gutachter (Gefahrstoffe/Brandschutz)'],
+        nextSteps:['Anforderungen des Anlagentyps mit Fachplaner klären','Genehmigungsbehörde frühzeitig einbinden']
+      }
+    ]
+  },
+  {
+    id:'technik', title:'Technische Anlage', icon:'⚙️',
+    desc:'Einbau oder Austausch technischer Anlagen ohne größere bauliche Eingriffe.',
+    massnahmen:[
+      {
+        id:'maschine-einbau', title:'Einbau/Austausch einer Produktionsanlage', roles:['tragwerksplaner'],
+        intro:'Neue oder ausgetauschte Maschine/Anlage im Bestand.',
+        blocks:[
+          block('warn','Bauliche Anforderungen','Auch ohne Umbau kann eine neue Maschine bauliche Anforderungen auslösen (Fundament, Lastabtragung auf die Bodenplatte, Anschlüsse).'),
+          block('warn','Maschinenrichtlinie/CE','Die maschinenspezifische Sicherheit läuft parallel zum Baurecht und ist meist Sache des Herstellers/Betreibers.'),
+          block('warn','Explosionsschutz','Bei Prozessen mit brennbaren Stoffen/Stäuben kann die Maschine Einfluss auf die Ex-Zonen-Einteilung haben.')
+        ],
+        fachleute:['Tragwerksplaner (bei hoher Last)','Fachplaner Explosionsschutz (falls relevant)','Maschinenhersteller/Inbetriebnehmer'],
+        nextSteps:['Lastangaben mit Tragwerksplaner abgleichen','Explosionsschutz-Relevanz prüfen','Anschlusswerte klären (Strom, Druckluft, Absaugung)']
+      },
+      {
+        id:'lueftung', title:'Einbau/Austausch Lüftungs-/Absauganlage', roles:['tragwerksplaner'],
+        intro:'Neue Anlage zur Be- und Entlüftung oder Absaugung von Stäuben/Dämpfen.',
+        blocks:[
+          block('warn','Statik für Dachlast/Durchführungen','Lüftungsgeräte auf dem Dach oder Kanaldurchführungen durch tragende Bauteile können statisch relevant sein.'),
+          block('warn','Immissionsschutz','Abluft (Lärm, Gerüche, Stäube) kann immissionsschutzrechtlich relevant sein, besonders in Nähe von Wohnbebauung.'),
+          block('ok','Genehmigung','Reine technische Anlagen ohne bauliche Eingriffe sind oft nicht separat baugenehmigungspflichtig, eine Anzeige kann aber nötig sein.')
+        ],
+        fachleute:['Fachplaner TGA/Lüftung','Tragwerksplaner (bei Dachlast)'],
+        nextSteps:['Lastangaben und Durchführungspunkte klären','Immissionsschutz-Relevanz prüfen','Bei Unsicherheit Bauamt/Gewerbeaufsicht kontaktieren']
+      },
+      {
+        id:'gefahrstofflager', title:'Einbau eines Lagers für Gefahrstoffe/Chemikalien', roles:['tragwerksplaner'],
+        intro:'Neues oder erweitertes Lager für wassergefährdende oder brennbare Stoffe.',
+        blocks:[
+          block('risk','Wasserrechtliche Anforderungen','Die Lagerung wassergefährdender Stoffe erfordert i. d. R. Auffangwannen/-räume nach AwSV und ggf. eine wasserrechtliche Erlaubnis.'),
+          block('risk','Brand-/Explosionsschutz','Je nach Stoffklasse gelten besondere Anforderungen an Abstände, Lüftung und Explosionsschutz.'),
+          block('warn','Genehmigung','Ab bestimmten Mengen kann eine immissionsschutzrechtliche Genehmigung (BImSchG) statt einer reinen Baugenehmigung erforderlich sein.')
+        ],
+        fachleute:['Fachplaner Gefahrstoffe/Umwelt','Fachplaner Explosionsschutz','Tragwerksplaner'],
+        nextSteps:['Stoffliste und Mengen erfassen','Fachplaner für Gefahrstofflagerung einbinden','Genehmigungsbehörde frühzeitig kontaktieren']
+      },
+      {
+        id:'ladeinfrastruktur', title:'Ladeinfrastruktur für E-Fahrzeuge/Stapler', roles:['tragwerksplaner'],
+        intro:'Ladepunkte für E-Fahrzeuge oder elektrische Flurförderzeuge.',
+        blocks:[
+          block('warn','Elektrische Anschlussleistung','Ladeinfrastruktur benötigt oft eine deutlich höhere Anschlussleistung – frühzeitig mit dem Netzbetreiber klären.'),
+          block('warn','Brandschutz','Ladebereiche für Fahrzeuge/Akkus können eigene Brandschutzanforderungen auslösen.'),
+          block('ok','Bauliche Eingriffe','Bei reiner Elektroinstallation ohne größere bauliche Änderung meist geringeres Genehmigungsrisiko.')
+        ],
+        fachleute:['Elektrofachplaner','ggf. Brandschutzplaner'],
+        nextSteps:['Anschlussleistung mit Netzbetreiber klären','Brandschutzkonzept bei größeren Anlagen prüfen lassen']
+      },
+      {
+        id:'notstrom', title:'Einbau Notstromaggregat/Trafo', roles:['tragwerksplaner'],
+        intro:'Neue oder zusätzliche Anlage zur Notstromversorgung.',
+        blocks:[
+          block('warn','Lärm-/Immissionsschutz','Notstromaggregate können Lärmgrenzwerte berühren, besonders im Testbetrieb oder nahe schutzbedürftiger Nutzungen.'),
+          block('warn','Brandschutz/Abstände','Kraftstofflagerung und Aufstellung unterliegen eigenen Abstands- und Brandschutzanforderungen.'),
+          block('ok','Genehmigung','Reine technische Anlage, oft anzeige- statt genehmigungspflichtig, abhängig von Leistung und Kraftstoffmenge.')
+        ],
+        fachleute:['Fachplaner Elektro/TGA','ggf. Brandschutzplaner'],
+        nextSteps:['Aufstellort und Abstände mit Fachplaner klären','Lärmschutz prüfen','Bei Unsicherheit Bauamt/Gewerbeaufsicht kontaktieren']
+      }
+    ]
+  }
+];
+
+/* ---------- generic engine (shared pattern with privat.html) ---------- */
+function findKategorie(id){return KATEGORIEN.find(k=>k.id===id);}
+function findMassnahme(kat,id){return kat? kat.massnahmen.find(m=>m.id===id) : null;}
+
+function badge(level){
+  const cls = level==='ok'?'status-ok':level==='warn'?'status-warn':'status-risk';
+  const icon = level==='ok'?'✓':level==='warn'?'!':'✕';
+  const text = level==='ok'?'Unkritisch':level==='warn'?'Prüfen':'Kritisch';
+  return `<span class="status-badge ${cls}">${icon} ${text}</span>`;
+}
+function renderBlock(b){
+  return `<div class="result-block">${badge(b.level)}<h4>${b.title}</h4><p>${b.text}</p></div>`;
+}
+function renderFachplaner(plz,roles){
+  if(!roles || roles.length===0){
+    return `<p class="disclaimer-small">Für diese Maßnahme wird meist kein bauvorlageberechtigter Planer benötigt – ein lokaler Fachbetrieb reicht in der Regel aus. Eine Vermittlung von Fachbetrieben ist noch nicht Teil dieses Prototyps.</p>`;
+  }
+  if(!/^\d{5}$/.test(plz)) return '';
+  const entry = FACHPLANER_DB[plz[0]];
+  if(!entry) return '';
+  let html = `<div class="fachplaner-box"><h4>Fachplaner-Vorschläge für ${entry.region} (PLZ ${plz})</h4>`;
+  if(roles.includes('tragwerksplaner') && entry.tragwerksplaner){
+    html += `<div class="firm-card"><div class="role">Tragwerksplaner</div><div class="name">${entry.tragwerksplaner.name}</div><a href="${entry.tragwerksplaner.website}" target="_blank" rel="noopener">${entry.tragwerksplaner.website}</a></div>`;
+  }
+  if(roles.includes('architekt') && entry.architekt){
+    html += `<div class="firm-card"><div class="role">Architekt</div><div class="name">${entry.architekt.name}</div><a href="${entry.architekt.website}" target="_blank" rel="noopener">${entry.architekt.website}</a></div>`;
+  }
+  html += `<p class="disclaimer-small">Diese Vorschläge stammen aus einer ersten Online-Recherche für deine Region (nicht die exakte Stadt), erheben keinen Anspruch auf Vollständigkeit oder Eignung fürs konkrete Projekt und sind keine Empfehlung. Bitte Kontakt, Referenzen und Kapazität selbst prüfen.</p></div>`;
+  return html;
+}
+
+function renderKategorien(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="breadcrumb">Start</div>
+    <h2 class="step-title">1. Um welche Art von Vorhaben geht es?</h2>
+    <p class="step-sub">Wähle die passende Kategorie – im nächsten Schritt wird es konkreter.</p>
+    <div class="grid cat-grid">
+      ${KATEGORIEN.map(k=>`<div class="card" onclick="location.hash='${k.id}'"><h3>${k.icon} ${k.title}</h3><p>${k.desc}</p></div>`).join('')}
+    </div>`;
+}
+
+function renderMassnahmen(kat){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="breadcrumb"><a onclick="location.hash=''">Start</a><span class="sep">›</span>${kat.title}</div>
+    <h2 class="step-title">2. Welche konkrete Maßnahme ist geplant?</h2>
+    <p class="step-sub">${kat.desc}</p>
+    <div class="grid">
+      ${kat.massnahmen.map(m=>`<div class="card" onclick="location.hash='${kat.id}/${m.id}'"><h3>${m.title}</h3><p>${m.intro}</p></div>`).join('')}
+    </div>`;
+}
+
+function renderDetail(kat,m){
+  const app = document.getElementById('app');
+  const hasDynamic = !!m.dynamic;
+  app.innerHTML = `
+    <div class="breadcrumb"><a onclick="location.hash=''">Start</a><span class="sep">›</span><a onclick="location.hash='${kat.id}'">${kat.title}</a><span class="sep">›</span>${m.title}</div>
+    <div class="detail-panel">
+      <div class="panel-box">
+        <h3>${m.title}</h3>
+        <p class="intro">${m.intro}</p>
+        ${hasDynamic ? `
+          <fieldset>
+            <legend>${m.dynamic.field.label}</legend>
+            <select id="dyn-field">${m.dynamic.field.options.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select>
+          </fieldset>
+          <button class="primary" id="btn-run">Leitfaden erstellen</button>
+        ` : `<button class="primary" id="btn-run">Leitfaden anzeigen</button>`}
+        <fieldset style="margin-top:18px;">
+          <legend>Postleitzahl deines Standorts (optional)</legend>
+          <div class="plz-row">
+            <input type="text" id="plz-input" maxlength="5" placeholder="z. B. 40210">
+          </div>
+          <p class="hint">Für Vorschläge zu Fachplanern in deiner Region.</p>
+        </fieldset>
+      </div>
+      <div class="panel-box" id="result-box">
+        <h3>Leitfaden</h3>
+        <p class="placeholder">Klicke auf „Leitfaden erstellen", um deine Ersteinschätzung zu sehen.</p>
+      </div>
+    </div>`;
+
+  function run(){
+    const values = {};
+    if(hasDynamic){ values[m.dynamic.field.id] = document.getElementById('dyn-field').value; }
+    const blocks = hasDynamic ? m.dynamic.blocks(values) : m.blocks;
+    const plz = document.getElementById('plz-input').value.trim();
+    const fachleuteChips = m.fachleute.map(f=>`<span class="chip">${f}</span>`).join('');
+    const stepsList = m.nextSteps.map(s=>`<li>${s}</li>`).join('');
+    document.getElementById('result-box').innerHTML = `
+      <h3>Leitfaden: ${m.title}</h3>
+      ${blocks.map(renderBlock).join('')}
+      <div class="result-block"><h4>Wahrscheinlich benötigte Fachleute</h4><div class="chips">${fachleuteChips}</div></div>
+      <div class="result-block"><h4>Empfohlene nächste Schritte</h4><ul class="tasklist">${stepsList}</ul></div>
+      ${renderFachplaner(plz, m.roles)}
+      <p class="disclaimer">Diese Ersteinschätzung basiert auf einer vereinfachten Regellogik, ersetzt keine rechtsverbindliche Prüfung durch Bauamt, Tragwerksplaner oder Fachgutachter und enthält keine statische Berechnung. Vorgaben unterscheiden sich je Bundesland, Kommune und Einzelfall.</p>`;
+  }
+  document.getElementById('btn-run').addEventListener('click', run);
+}
+
+function route(){
+  const hash = location.hash.replace(/^#/,'');
+  if(!hash){ renderKategorien(); return; }
+  const [katId,massId] = hash.split('/');
+  const kat = findKategorie(katId);
+  if(!kat){ renderKategorien(); return; }
+  if(!massId){ renderMassnahmen(kat); return; }
+  const m = findMassnahme(kat,massId);
+  if(!m){ renderMassnahmen(kat); return; }
+  renderDetail(kat,m);
+}
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
