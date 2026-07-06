@@ -184,6 +184,7 @@ const KATEGORIEN = [
       {
         id:'anbau-haus', title:'Anbau ans Haus', roles:['tragwerksplaner','architekt'],
         intro:'Zusätzliche Fläche direkt am bestehenden Gebäude.',
+        detail:{url:'anbau.html', label:'Neu: geführter Machbarkeits-Check mit Skizze, B-Plan-Anleitung und automatischer Prüfung (GRZ, Abstandsflächen, Baugrenze)'},
         dynamic:{
           fields:[
             {id:'flaeche', label:'Zusätzliche Fläche (m²)', type:'number', placeholder:'z. B. 25'},
@@ -444,6 +445,7 @@ function renderDetail(kat,m){
       <div class="panel-box">
         <h3>${m.title}</h3>
         <p class="intro">${m.intro}</p>
+        ${m.detail ? `<p style="margin:0 0 16px;"><a href="${m.detail.url}" style="display:inline-block;background:var(--accent);color:#fff;text-decoration:none;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;">&#9654; ${m.detail.label}</a></p>` : ''}
         ${fields.map(fieldHtml).join('')}
         <button class="primary" id="btn-run">${hasDynamic ? 'Leitfaden erstellen' : 'Leitfaden anzeigen'}</button>
         <fieldset style="margin-top:18px;">
