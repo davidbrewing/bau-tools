@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privates Bauvorhaben – Bau-Tools</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --border:#e1e4e9; --text:#1c2430; --muted:#5b6472;
+    --accent:#2a7a5e; --accent-dark:#1f5c46; --accent-light:#e6f3ee;
+    --ok:#1e7a3c; --ok-bg:#e7f5eb; --warn:#9a6400; --warn-bg:#fdf3dc; --risk:#a4222c; --risk-bg:#fbe9ea;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;}
+  header{background:var(--accent);color:#fff;padding:26px 24px 20px;}
+  header h1{margin:0 0 6px;font-size:21px;}
+  header p{margin:0;color:#e2f2ea;font-size:13.5px;max-width:760px;}
+  a.home-link{color:#e2f2ea;font-size:12.5px;text-decoration:none;}
+  a.home-link:hover{text-decoration:underline;}
+  .wrap{max-width:980px;margin:0 auto;padding:22px 20px 60px;}
+  .breadcrumb{font-size:12.5px;color:var(--muted);margin-bottom:18px;}
+  .breadcrumb a{color:var(--accent);text-decoration:none;cursor:pointer;}
+  .breadcrumb a:hover{text-decoration:underline;}
+  .breadcrumb .sep{margin:0 6px;color:#c3c9d1;}
+  h2.step-title{font-size:19px;margin:0 0 6px;}
+  p.step-sub{margin:0 0 20px;color:var(--muted);font-size:13.5px;}
+  .grid{display:grid;gap:16px;grid-template-columns:1fr;}
+  @media (min-width:640px){.grid{grid-template-columns:1fr 1fr;}}
+  @media (min-width:960px){.grid.cat-grid{grid-template-columns:repeat(4,1fr);}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;transition:box-shadow .15s, transform .15s;}
+  .card:hover{box-shadow:0 6px 18px rgba(0,0,0,0.08);transform:translateY(-1px);}
+  .card h3{margin:0 0 6px;font-size:15.5px;color:var(--accent);}
+  .card p{margin:0;font-size:13px;color:var(--muted);}
+  .detail-panel{display:grid;gap:20px;grid-template-columns:1fr;}
+  @media (min-width:900px){.detail-panel{grid-template-columns:1.1fr 1fr;}}
+  .panel-box{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;}
+  .panel-box h3{margin:0 0 6px;font-size:16px;}
+  .panel-box .intro{font-size:13.5px;color:var(--muted);margin:0 0 16px;}
+  fieldset{border:none;padding:0;margin:0 0 16px;}
+  legend{font-weight:600;font-size:13.5px;margin-bottom:6px;padding:0;}
+  label.field-label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;}
+  select,input[type=text],input[type=number]{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13.5px;font-family:inherit;background:#fff;color:var(--text);}
+  .row{display:flex;gap:14px;flex-wrap:wrap;}
+  .row > div{flex:1;min-width:160px;}
+  .hint{font-size:12px;color:var(--muted);margin:4px 0 0;}
+  .status-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:8px;}
+  .status-ok{background:var(--ok-bg);color:var(--ok);}
+  .status-warn{background:var(--warn-bg);color:var(--warn);}
+  .status-risk{background:var(--risk-bg);color:var(--risk);}
+  .result-block{border:1px solid var(--border);border-radius:9px;padding:13px 15px;margin-bottom:11px;}
+  .result-block h4{margin:0 0 5px;font-size:14px;}
+  .result-block p{margin:0;font-size:13px;color:#31394a;}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 0;}
+  .chip{background:var(--accent-light);color:var(--accent-dark);font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;}
+  ul.tasklist{margin:6px 0 0;padding-left:18px;}
+  ul.tasklist li{font-size:13px;margin-bottom:5px;}
+  .plz-row{display:flex;gap:8px;margin-top:6px;}
+  .plz-row input{flex:1;}
+  button{cursor:pointer;font-family:inherit;}
+  button.primary{background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:600;}
+  button.primary:hover{background:var(--accent-dark);}
+  .fachplaner-box{margin-top:14px;background:#fafbfc;border:1px solid var(--border);border-radius:9px;padding:12px 14px;}
+  .fachplaner-box h4{margin:0 0 8px;font-size:13.5px;}
+  .firm-card{border:1px solid var(--border);border-radius:7px;padding:8px 10px;margin-bottom:8px;background:#fff;}
+  .firm-card .role{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:700;}
+  .firm-card .name{font-size:13.5px;font-weight:600;margin:2px 0;}
+  .firm-card a{font-size:12.5px;color:var(--accent);}
+  .disclaimer-small{font-size:11.5px;color:var(--muted);margin-top:8px;}
+  .disclaimer{font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:16px;padding-top:12px;}
+  .placeholder{color:var(--muted);font-size:13.5px;}
+</style>
+</head>
+<body>
+<header>
+  <p style="margin-bottom:8px;"><a class="home-link" href="index.html">← Zur Startseite</a></p>
+  <h1>Privates Bauvorhaben – Zuhause &amp; Garten</h1>
+  <p>Ersteinschätzung für Umbauten, Anbauten und Anlagen rund um dein Zuhause. Ersetzt keine Prüfung durch Tragwerksplaner, Architekt oder Bauamt.</p>
+</header>
+<div class="wrap" id="app"></div>
+
+<script>
+const FACHPLANER_DB = {
+  '0': {region:'Raum Dresden / Sachsen, Thüringen', tragwerksplaner:{name:'PENZL. Ingenieure Tragwerksplanung GmbH', website:'https://www.penzl-ingenieure.de/'}, architekt:{name:'drauschke & fliegel Architektur', website:'https://www.drauschkefliegel.de/'}},
+  '1': {region:'Raum Berlin / Brandenburg', tragwerksplaner:{name:'LOSSEN INGENIEURE GmbH', website:'https://www.lossen-ingenieure.de/'}, architekt:{name:'AMB-Architekten Machka', website:'https://amb-machka.jimdoweb.com/industriebau/'}},
+  '2': {region:'Raum Hamburg / Schleswig-Holstein, Bremen', tragwerksplaner:{name:'NAi Nagaraj Ingenieure', website:'https://www.nagaraj-ingenieure.de/'}, architekt:{name:'Architekturbüro Herzog & Söchtig', website:'https://www.architekt-hamburg.com/industriebau/'}},
+  '3': {region:'Raum Hannover / Niedersachsen', tragwerksplaner:{name:'shl ingenieure GmbH', website:'https://shl-ing.com/'}, architekt:{name:'Architekt Pielhop', website:'http://www.pielhop.de/'}},
+  '4': {region:'Raum Dortmund / Ruhrgebiet', tragwerksplaner:{name:'Cramer Engineering', website:'https://cramer-engineering.de/'}, architekt:{name:'SHA Scheffler Helbich Architekten', website:'https://sha.de/'}},
+  '5': {region:'Raum Köln / Rheinland', tragwerksplaner:{name:'Ingenieurbüro Grobecker GmbH', website:'https://grobecker.koeln/'}, architekt:{name:'frerichsarchitektur', website:'https://frerichsarchitektur.de/projekte/architekt-industriebau-gewerbebau/'}},
+  '6': {region:'Raum Frankfurt / Hessen', tragwerksplaner:{name:'jmquadrat', website:'https://jmquadrat.de/'}, architekt:{name:'Architekten Michel', website:'https://www.architekten-michel.de/expertise/industrie-und-gewerbebauten/'}},
+  '7': {region:'Raum Stuttgart / Baden-Württemberg', tragwerksplaner:{name:'tragwerk-s', website:'https://www.tragwerk-s.de/'}, architekt:{name:'Neugebauer + Rösch Architekten', website:'https://neugebauer-roesch.pxcld.com/architekt-fuer-industriebau.html'}},
+  '8': {region:'Raum München / Bayern-Süd', tragwerksplaner:{name:'BERT Ingenieure GmbH & Co. KG', website:'https://bert-ingenieure.de/'}, architekt:{name:'Bottler Lutz Architekten', website:'https://www.bottler-lutz.de/industrie-und-logistik/'}},
+  '9': {region:'Raum Nürnberg / Bayern-Nord', tragwerksplaner:{name:'Ingenieurquadrat Part mbB', website:'https://www.ing2.de/'}, architekt:{name:'Wagner + Nenadovic Architekten', website:'http://www.wagner-nenadovic-architekten.de/'}}
+};
+
+function block(level,title,text){return {level,title,text};}
+
+const KATEGORIEN = [
+  {
+    id:'innenausbau', title:'Innenausbau & Umbau', icon:'🧱',
+    desc:'Veränderungen innerhalb des Hauses oder der Wohnung.',
+    massnahmen:[
+      {
+        id:'wand-entfernen', title:'Wand entfernen / Durchbruch', roles:['tragwerksplaner'],
+        intro:'Entfernen oder Durchbrechen einer Innenwand, z. B. um Räume zusammenzulegen.',
+        dynamic:{
+          fields:[
+            {id:'tragend', label:'Ist die Wand vermutlich tragend?', options:[['unsicher','Unsicher'],['ja','Ja'],['nein','Nein']]},
+            {id:'baujahr', label:'Baujahr des Gebäudes', options:[['nach1980','Nach 1980'],['vor1980','Vor 1980'],['unsicher','Unbekannt']]}
+          ],
+          blocks:function(v){
+            const out=[];
+            if(v.tragend==='ja') out.push(block('risk','Tragende Wand','Ein Standsicherheitsnachweis durch einen Tragwerksplaner ist zwingend erforderlich, auch wenn der Durchbruch selbst baurechtlich oft keine gesonderte Genehmigung braucht. Die Ausführung sollte ein Fachbetrieb übernehmen (z. B. Unterzug/Stahlträger einbauen).'));
+            else if(v.tragend==='unsicher') out.push(block('warn','Tragende Wand – unklar','Ohne Bestandsunterlagen oder Vor-Ort-Prüfung lässt sich das nicht sicher beurteilen. Bestandspläne/Statik sichten lassen oder einen Tragwerksplaner kurz vor Ort schauen lassen.'));
+            else out.push(block('ok','Tragende Wand','Nach deiner Einschätzung nicht tragend – geringeres statisches Risiko. Trotzdem auf Leitungen/Installationen in der Wand achten.'));
+            if(v.baujahr==='vor1980') out.push(block('warn','Baujahr vor 1980','Bei älteren Gebäuden sind Bestandsunterlagen oft unvollständig, und das Tragwerk kann durch frühere Umbauten verändert worden sein. Das erhöht die Bedeutung einer fachlichen Vor-Ort-Prüfung.'));
+            out.push(block('warn','Eigentumswohnung (WEG)','Falls du in einer Eigentumswohnung lebst: Eingriffe, die das Gemeinschaftseigentum betreffen (z. B. tragende Wände), brauchen in der Regel einen WEG-Beschluss – unabhängig von der Baugenehmigung.'));
+            return out;
+          }
+        },
+        fachleute:['Tragwerksplaner (bauvorlageberechtigt)','Fachbetrieb Abbruch/Trockenbau'],
+        nextSteps:['Bestandspläne/Statik sichten','Tragwerksplaner beauftragen','Bei WEG Rücksprache mit Hausverwaltung']
+      },
+      {
+        id:'bad-umbau', title:'Bad-/Grundrissänderung', roles:['tragwerksplaner'],
+        intro:'Verlegen von Bad/WC oder Versetzen von Zwischenwänden.',
+        blocks:[
+          block('warn','Sanitärleitungen','Das Verlegen von Bad/WC kann neue Abwasserleitungen mit Gefälle erfordern – Platzbedarf in Decke/Boden vorab prüfen.'),
+          block('warn','Tragende Wände','Werden Wände versetzt, gilt dieselbe Vorsicht wie beim reinen Wanddurchbruch.'),
+          block('warn','WEG-Zustimmung','Bei Eigentumswohnungen können Leitungsverlegungen im Gemeinschaftseigentum zustimmungspflichtig sein.'),
+          block('ok','Genehmigung','Eine reine Grundrissänderung innerhalb der Wohnung ist meist nicht baugenehmigungspflichtig, sofern keine tragenden Teile betroffen sind.')
+        ],
+        fachleute:['Sanitärfachbetrieb','ggf. Tragwerksplaner'],
+        nextSteps:['Grundriss mit Fachbetrieb/Architekt planen','Bei tragenden Wänden Tragwerksplaner einbinden','Bei WEG Rücksprache mit Hausverwaltung']
+      },
+      {
+        id:'dachgeschoss-nutzung', title:'Dachgeschossausbau ohne Kubaturänderung', roles:['architekt'],
+        intro:'Vorhandenen Speicher zu Wohnraum ausbauen, ohne Gaube oder Anhebung.',
+        blocks:[
+          block('risk','Aufenthaltsraum-Anforderungen','Für Wohnraum gelten Mindestanforderungen an Raumhöhe, Belichtung und Rettungswege – das ist der häufigste Stolperstein.'),
+          block('warn','Statik/Dämmung','Zusätzlicher Fußbodenaufbau und Dämmung verändern Lasten und können den Wärmeschutznachweis (GEG) auslösen.'),
+          block('warn','Zweiter Rettungsweg','Für neuen Wohnraum im Dachgeschoss wird oft ein zweiter Rettungsweg gefordert (z. B. Fenster mit Anleiterstelle).'),
+          block('ok','Genehmigung','Nutzungsänderung ohne bauliche Veränderung der Hülle ist in einigen Bundesländern vereinfacht, aber meist trotzdem anzeigepflichtig.')
+        ],
+        fachleute:['Architekt','ggf. Tragwerksplaner'],
+        nextSteps:['Raumhöhen/Belichtung vorab prüfen','Rettungswegkonzept klären','Bauamt zur Anzeige-/Genehmigungspflicht befragen']
+      },
+      {
+        id:'keller-sanierung', title:'Kellersanierung/-umbau', roles:['architekt'],
+        intro:'Sanierung oder Umnutzung von Kellerräumen.',
+        blocks:[
+          block('risk','Abdichtung gegen Feuchtigkeit','Die Nutzungsänderung von Keller zu Aufenthaltsraum erfordert meist eine funktionierende Abdichtung gegen drückendes/nichtdrückendes Wasser.'),
+          block('warn','Raumhöhe/Belichtung','Für Aufenthaltsräume im Keller gelten ähnliche Mindestanforderungen wie im Dachgeschoss.'),
+          block('ok','Reine Sanierung','Reine Instandsetzung (z. B. neue Bodenbeläge, Anstrich) ohne Nutzungsänderung ist in der Regel genehmigungsfrei.')
+        ],
+        fachleute:['Fachbetrieb Abdichtung','ggf. Architekt'],
+        nextSteps:['Feuchtigkeitszustand fachlich prüfen lassen','Bei geplanter Wohnnutzung Anforderungen mit Bauamt/Architekt klären']
+      }
+    ]
+  },
+  {
+    id:'dach-anbau', title:'Dach & Anbau', icon:'🏠',
+    desc:'Veränderungen an Dach oder Gebäudehülle, zusätzliche Fläche am Haus.',
+    massnahmen:[
+      {
+        id:'dachausbau-kubatur', title:'Dachausbau mit Kubaturänderung', roles:['tragwerksplaner','architekt'],
+        intro:'Gaube, Dachflächenfenster, Anhebung oder neuer Wohnraum im Dach.',
+        dynamic:{
+          fields:[
+            {id:'kubatur', label:'Wird die Dachform/Kubatur verändert (z. B. Gaube, Anhebung)?', options:[['ja','Ja'],['nein','Nein']]},
+            {id:'nutzung', label:'Entsteht neuer Wohnraum (Nutzungsänderung Speicher → Wohnraum)?', options:[['ja','Ja'],['nein','Nein']]}
+          ],
+          blocks:function(v){
+            const out=[];
+            if(v.kubatur==='ja') out.push(block('risk','Veränderung der Dachform','Gauben, Anhebungen oder ähnliche Eingriffe in die Kubatur sind so gut wie immer baugenehmigungspflichtig und berühren Statik, Wärmeschutz und oft auch das Erscheinungsbild (ggf. Bebauungsplan/Ortsbild).'));
+            else out.push(block('ok','Dachform unverändert','Geringeres Risiko, trotzdem beim Bauamt nachfragen, ob eine Anzeige nötig ist.'));
+            if(v.nutzung==='ja') out.push(block('risk','Neuer Wohnraum im Dach','Sobald aus Speicherfläche Aufenthaltsraum wird, greifen Anforderungen an Deckenhöhe, Belichtung, Rettungswege und Schallschutz – das ist der häufigste Stolperstein bei Dachausbauten.'));
+            return out;
+          }
+        },
+        fachleute:['Tragwerksplaner','Architekt/Bauvorlageberechtigter'],
+        nextSteps:['Prüfen lassen, ob die geplanten Räume die Mindestanforderungen an Aufenthaltsräume erfüllen können','Architekten-/Tragwerksplaner-Angebot einholen','Bauantrag/Anzeige vorbereiten']
+      },
+      {
+        id:'anbau-haus', title:'Anbau ans Haus', roles:['tragwerksplaner','architekt'],
+        intro:'Zusätzliche Fläche direkt am bestehenden Gebäude.',
+        dynamic:{
+          fields:[
+            {id:'flaeche', label:'Zusätzliche Fläche (m²)', type:'number', placeholder:'z. B. 25'},
+            {id:'grenze', label:'Grenzabstand betroffen/knapp?', options:[['unsicher','Unsicher'],['ja','Ja'],['nein','Nein']]}
+          ],
+          blocks:function(v){
+            const out=[];
+            out.push(block('risk','Baugenehmigung Anbau', `Anbauten mit zusätzlicher Fläche (hier ca. ${v.flaeche||'–'} m²) sind so gut wie immer baugenehmigungspflichtig. Zulässige Grundflächenzahl (GRZ), Baugrenzen und der Anschluss an die Bestandsstatik sind zentrale Prüfpunkte.`));
+            if(v.grenze==='ja' || v.grenze==='unsicher') out.push(block('warn','Grenzabstand','Abstandsflächen zum Nachbargrundstück früh prüfen bzw. vermessen lassen – das entscheidet oft über die genaue Position und Größe des Anbaus.'));
+            return out;
+          }
+        },
+        fachleute:['Tragwerksplaner','Architekt/Bauvorlageberechtigter'],
+        nextSteps:['Abstandsflächen zum Nachbargrundstück prüfen lassen','Architekten-/Tragwerksplaner-Angebot einholen','Bauantrag vorbereiten']
+      },
+      {
+        id:'aufstockung-privat', title:'Aufstockung', roles:['tragwerksplaner','architekt'],
+        intro:'Zusätzliches Geschoss auf dem bestehenden Haus.',
+        blocks:[
+          block('risk','Tragfähigkeit des Bestands','Ein Tragwerksplaner muss prüfen, ob Fundamente und tragende Wände die zusätzliche Last aufnehmen können.'),
+          block('warn','Höhenbeschränkung/Dachform','Bebauungsplan oder Ortsbildsatzung können Trauf-/Firsthöhe und Dachform vorgeben.'),
+          block('warn','Abstandsflächen','Eine größere Gebäudehöhe kann größere Abstandsflächen zur Grundstücksgrenze erfordern.')
+        ],
+        fachleute:['Tragwerksplaner','Architekt'],
+        nextSteps:['Statisches Gutachten zur Aufstockungsfähigkeit einholen','Bebauungsplan/Ortssatzung prüfen','Architekt für Bauantrag beauftragen']
+      },
+      {
+        id:'balkon-anbau', title:'Balkon-/Terrassenanbau am Gebäude', roles:['tragwerksplaner'],
+        intro:'Angehängter oder auskragender Balkon am Bestandsgebäude.',
+        blocks:[
+          block('warn','Statik der Anbindung','Ein angehängter oder auskragender Balkon braucht eine statisch nachgewiesene Befestigung/Konsole (Wärmebrücken beachten).'),
+          block('warn','Abstandsflächen','Je nach Bundesland und Auskragung kann ein Balkon abstandsflächenrelevant werden.'),
+          block('ok','Genehmigung','Kleinere Balkonanbauten sind in vielen Bundesländern verfahrensfrei oder vereinfacht genehmigungspflichtig – beim Bauamt nachfragen.')
+        ],
+        fachleute:['Tragwerksplaner','Fachbetrieb Metall-/Balkonbau'],
+        nextSteps:['Befestigungsart mit Tragwerksplaner/Hersteller klären','Abstandsflächen prüfen','Genehmigungspflicht beim Bauamt erfragen']
+      }
+    ]
+  },
+  {
+    id:'aussenanlage', title:'Außenanlage', icon:'🌳',
+    desc:'Bauten und Flächen auf dem Grundstück, außerhalb des Hauses.',
+    massnahmen:[
+      {
+        id:'gartenhaus', title:'Gartenhaus / Schuppen', roles:[],
+        intro:'Freistehendes Nebengebäude im Garten.',
+        dynamic:{
+          fields:[
+            {id:'flaeche', label:'Grundfläche (m²)', type:'number', placeholder:'z. B. 12'},
+            {id:'abstand', label:'Abstand zur Grundstücksgrenze (m)', type:'number', placeholder:'z. B. 2'}
+          ],
+          blocks:function(v){
+            const out=[]; const f=parseFloat(v.flaeche)||0; const a=parseFloat(v.abstand)||0;
+            if(f>30) out.push(block('risk','Größe', `Bei ca. ${f} m² liegst du in vielen Bundesländern oberhalb der Schwelle für Genehmigungsfreiheit (die genauen Grenzwerte für „verfahrensfreie" Nebenanlagen unterscheiden sich je Landesbauordnung deutlich – Spanne grob 10–75 m² umbauter Raum). Beim Bauamt konkret nachfragen.`));
+            else out.push(block('warn','Größe', `Bei ca. ${f||'–'} m² ist eine Genehmigungsfreiheit in manchen Bundesländern möglich, die genauen Schwellenwerte unterscheiden sich aber je Landesbauordnung – kurze Nachfrage beim Bauamt spart Ärger.`));
+            if(a<3) out.push(block('risk','Grenzabstand', `Ein Abstand von ca. ${a||'–'} m zur Grundstücksgrenze kann je nach Bundesland und zulässiger Wandlänge/Höhe der Nebenanlage die Abstandsflächenregeln verletzen. Vorab beim Bauamt prüfen oder schriftliche Nachbarzustimmung einholen.`));
+            return out;
+          }
+        },
+        fachleute:[],
+        nextSteps:['Genehmigungsfreiheit für die Größe beim Bauamt erfragen','Grenzabstand prüfen bzw. Nachbarzustimmung einholen']
+      },
+      {
+        id:'carport', title:'Carport / Garage', roles:[],
+        intro:'Überdachter Stellplatz oder Garage auf dem Grundstück.',
+        dynamic:{
+          fields:[
+            {id:'flaeche', label:'Grundfläche (m²)', type:'number', placeholder:'z. B. 18'},
+            {id:'abstand', label:'Abstand zur Grundstücksgrenze (m)', type:'number', placeholder:'z. B. 1'}
+          ],
+          blocks:function(v){
+            const out=[]; const f=parseFloat(v.flaeche)||0; const a=parseFloat(v.abstand)||0;
+            if(f>30) out.push(block('risk','Größe', `Bei ca. ${f} m² liegst du in vielen Bundesländern oberhalb der Schwelle für Genehmigungsfreiheit – Grenzwerte für Garagen/Carports unterscheiden sich je Landesbauordnung. Beim Bauamt konkret nachfragen.`));
+            else out.push(block('warn','Größe', `Bei ca. ${f||'–'} m² ist eine Genehmigungsfreiheit in manchen Bundesländern möglich – die genauen Schwellenwerte unterscheiden sich je Landesbauordnung.`));
+            if(a<1) out.push(block('ok','Grenzabstand','Garagen/Carports dürfen in vielen Bundesländern unter bestimmten Bedingungen direkt an der Grenze stehen – die genauen Regeln (max. Länge/Höhe) vorab beim Bauamt prüfen.'));
+            else out.push(block('warn','Grenzabstand', `Abstand von ca. ${a||'–'} m zur Grenze vorab mit den geltenden Abstandsflächenregeln abgleichen.`));
+            return out;
+          }
+        },
+        fachleute:[],
+        nextSteps:['Genehmigungsfreiheit für die Größe beim Bauamt erfragen','Grenzabstand/Grenzbebauung-Regeln prüfen']
+      },
+      {
+        id:'terrasse', title:'Terrassenüberdachung / Wintergarten', roles:[],
+        intro:'Überdachung oder Verglasung einer Terrasse.',
+        dynamic:{
+          field:{id:'geschlossen', label:'Wird die Überdachung seitlich verglast/geschlossen (Wintergarten, beheizt)?', options:[['nein','Nein, offen'],['ja','Ja, geschlossen/beheizt']]},
+          blocks:function(v){
+            const out=[];
+            if(v.geschlossen==='ja') out.push(block('risk','Geschlossener Wintergarten','Eine beheizte, geschlossene Konstruktion zählt bauordnungsrechtlich meist als Erweiterung der Wohnfläche – damit greifen energetische Anforderungen (GEG) und die Genehmigungspflicht ist wahrscheinlicher als bei einer offenen Überdachung.'));
+            else out.push(block('warn','Offene Terrassenüberdachung','Offene Überdachungen sind in vielen Bundesländern bis zu einer bestimmten Größe verfahrensfrei – Grenzabstand und Bebauungsplan-Vorgaben trotzdem prüfen.'));
+            return out;
+          }
+        },
+        fachleute:[],
+        nextSteps:['Genehmigungsfreiheit beim Bauamt erfragen','Grenzabstand prüfen']
+      },
+      {
+        id:'pool', title:'Pool / Schwimmbecken', roles:[],
+        intro:'Eingegrabenes oder oberirdisches Becken im Garten.',
+        dynamic:{
+          field:{id:'volumen', label:'Beckenvolumen (m³)', type:'number', placeholder:'z. B. 40'},
+          blocks:function(v){
+            const out=[]; const vol=parseFloat(v.volumen)||0;
+            if(vol>100) out.push(block('risk','Beckenvolumen', `Ab ca. 100 m³ Beckeninhalt verlangen mehrere Landesbauordnungen eine Baugenehmigung – bei ${vol} m³ solltest du das für deine Region konkret verifizieren.`));
+            else out.push(block('warn','Beckenvolumen','Kleinere Becken sind häufig verfahrensfrei, dennoch prüfen: Einfriedung/Absicherung gegen unbefugten Zugang ist in den meisten Bundesländern ab bestimmter Größe verpflichtend, unabhängig von der Baugenehmigung.'));
+            out.push(block('warn','Absicherung','Absicherung/Einzäunung des Pools gegen unbefugten Zugang frühzeitig einplanen (unabhängig von der Genehmigungsfrage).'));
+            return out;
+          }
+        },
+        fachleute:[],
+        nextSteps:['Beckenvolumen mit Landesbauordnung abgleichen','Absicherung/Einzäunung des Pools klären']
+      },
+      {
+        id:'einfriedung', title:'Einfriedung / Zaun / Mauer (grenznah)', roles:['tragwerksplaner'],
+        intro:'Zaun oder Mauer entlang der Grundstücksgrenze.',
+        blocks:[
+          block('warn','Höhe & Grenzabstand','Zäune/Mauern über einer bestimmten Höhe (oft 1,2–2 m, je nach Bundesland/Kommune) können genehmigungspflichtig sein oder einen Grenzabstand erfordern.'),
+          block('warn','Nachbarrecht','Unabhängig vom Baurecht regeln die Nachbarrechtsgesetze der Länder oft zusätzlich Grenzabstände und Zustimmungspflichten bei Einfriedungen direkt auf der Grenze.'),
+          block('ok','Ortsübliche Einfriedung','Ortsübliche Zäune/Hecken in üblicher Höhe sind meist verfahrensfrei.')
+        ],
+        fachleute:['in der Regel kein Fachplaner nötig, bei hohen Mauern ggf. Tragwerksplaner'],
+        nextSteps:['Höhe und Position mit Bauamt/Nachbarrechtsgesetz abgleichen','Bei hohen Mauern statischen Nachweis einholen']
+      },
+      {
+        id:'stellplatz-zufahrt', title:'Stellplatz-/Zufahrtsbau', roles:[],
+        intro:'Neue befestigte Fläche für Stellplatz oder Zufahrt.',
+        blocks:[
+          block('warn','Versiegelung & Regenwasser','Neue befestigte Flächen verändern die Versickerung von Regenwasser – manche Kommunen verlangen versickerungsfähige Beläge oder eine Rückhaltung.'),
+          block('warn','Stellplatzsatzung','Manche Bebauungspläne/Satzungen geben Mindest- oder Höchstzahlen an Stellplätzen vor.'),
+          block('ok','Genehmigung','Reine Befestigung einer Zufahrt ist oft verfahrensfrei, bei größeren Flächen oder Nähe zur Straße ggf. anzeigepflichtig.')
+        ],
+        fachleute:['Fachbetrieb Garten-/Tiefbau'],
+        nextSteps:['Kommune zu Versickerung/Entwässerung befragen','Stellplatzsatzung prüfen']
+      }
+    ]
+  },
+  {
+    id:'technik', title:'Haustechnik & Energie', icon:'🔌',
+    desc:'Technische Anlagen an oder in deinem Zuhause.',
+    massnahmen:[
+      {
+        id:'pv-privat', title:'PV-Anlage', roles:['tragwerksplaner'],
+        intro:'Solar-/Photovoltaikanlage auf dem Dach oder als Freiflächenanlage.',
+        dynamic:{
+          fields:[
+            {id:'montage', label:'Montageart', options:[['dach','Auf dem Dach'],['freiflaeche','Freifläche im Garten']]},
+            {id:'dach', label:'Baujahr/Zustand des Dachstuhls bekannt?', options:[['unsicher','Unsicher / nicht geprüft'],['ja','Ja, aktuell und tragfähig']]}
+          ],
+          blocks:function(v){
+            const out=[];
+            if(v.montage==='dach'){
+              if(v.dach==='unsicher') out.push(block('warn','Tragfähigkeit des Dachstuhls','PV-Module erhöhen die Dachlast dauerhaft (Eigengewicht plus ggf. höhere Schneelast-Anfälligkeit). Bei ungeprüftem oder älterem Dachstuhl die Tragfähigkeit vor Montage von einem Fachbetrieb/Tragwerksplaner kurz gegenchecken lassen.'));
+              else out.push(block('ok','Tragfähigkeit des Dachstuhls','Dachstuhl als tragfähig eingeschätzt – geringeres Risiko.'));
+              out.push(block('ok','Genehmigung Dachanlage','Dachmontage von PV ist in den meisten Bundesländern verfahrensfrei. Bei Denkmalschutz oder Bebauungsplan-Vorgaben zur Dachgestaltung gelten die oben genannten Punkte trotzdem.'));
+            } else {
+              out.push(block('risk','Freiflächenanlage','Freiflächen-PV unterliegt häufig dem Bebauungsplan bzw. den Regeln für den Außenbereich und ist deutlich eher genehmigungspflichtig als eine Dachanlage.'));
+            }
+            return out;
+          }
+        },
+        fachleute:['Tragwerksplaner oder Dachdecker-Fachbetrieb','Elektrofachbetrieb/PV-Fachbetrieb'],
+        nextSteps:['Tragfähigkeit des Dachs klären lassen','Netzbetreiber/Anmeldung klären','PV-Fachbetrieb für Planung/Montage beauftragen']
+      },
+      {
+        id:'waermepumpe', title:'Wärmepumpe / Heizungstausch', roles:[],
+        intro:'Austausch der Heizung gegen eine Wärmepumpe oder anderes System.',
+        blocks:[
+          block('warn','Schallschutz','Außenaufgestellte Wärmepumpen können Lärmgrenzwerte gegenüber Nachbargrundstücken berühren – Abstand und Schalldaten vorab beachten.'),
+          block('warn','Abstandsflächen','Manche Bundesländer verlangen Mindestabstände zur Grundstücksgrenze für Außengeräte.'),
+          block('ok','Genehmigung','Der reine Heizungstausch ist in der Regel nicht baugenehmigungspflichtig, aber beim Schornsteinfeger/Energieberater anzeigen.')
+        ],
+        fachleute:['Fachbetrieb Heizung/Sanitär','Energieberater'],
+        nextSteps:['Schallprognose/Aufstellort mit Fachbetrieb klären','Fördermöglichkeiten (BEG) prüfen']
+      },
+      {
+        id:'wallbox', title:'Ladestation E-Auto (Wallbox)', roles:[],
+        intro:'Ladepunkt für ein Elektrofahrzeug am eigenen Stellplatz.',
+        blocks:[
+          block('ok','Meist unkompliziert','Eine Wallbox am Eigenheim ist in der Regel nicht baugenehmigungspflichtig.'),
+          block('warn','Anschlussleistung','Ab einer bestimmten Leistung (meist ab 11 kW) ist eine Anmeldung, ab höherer Leistung eine Genehmigung beim Netzbetreiber nötig.'),
+          block('warn','WEG-Zustimmung','Bei Eigentumswohnungen/Stellplätzen in der Tiefgarage besteht zwar ein gesetzlicher Anspruch auf Genehmigung, aber der Anmeldeprozess bei der WEG sollte frühzeitig angestoßen werden.')
+        ],
+        fachleute:['Elektrofachbetrieb'],
+        nextSteps:['Elektrofachbetrieb für Anschluss/Anmeldung beauftragen','Bei WEG frühzeitig Antrag stellen']
+      }
+    ]
+  }
+];
+
+/* ---------- generic engine (shared pattern with industrie.html) ---------- */
+function findKategorie(id){return KATEGORIEN.find(k=>k.id===id);}
+function findMassnahme(kat,id){return kat? kat.massnahmen.find(m=>m.id===id) : null;}
+
+function badge(level){
+  const cls = level==='ok'?'status-ok':level==='warn'?'status-warn':'status-risk';
+  const icon = level==='ok'?'✓':level==='warn'?'!':'✕';
+  const text = level==='ok'?'Unkritisch':level==='warn'?'Prüfen':'Kritisch';
+  return `<span class="status-badge ${cls}">${icon} ${text}</span>`;
+}
+function renderBlock(b){
+  return `<div class="result-block">${badge(b.level)}<h4>${b.title}</h4><p>${b.text}</p></div>`;
+}
+function renderFachplaner(plz,roles){
+  if(!roles || roles.length===0){
+    return `<p class="disclaimer-small">Für diese Maßnahme wird meist kein bauvorlageberechtigter Planer benötigt – ein lokaler Fachbetrieb reicht in der Regel aus. Eine Vermittlung von Fachbetrieben ist noch nicht Teil dieses Prototyps.</p>`;
+  }
+  if(!/^\d{5}$/.test(plz)) return '';
+  const entry = FACHPLANER_DB[plz[0]];
+  if(!entry) return '';
+  let html = `<div class="fachplaner-box"><h4>Fachplaner-Vorschläge für ${entry.region} (PLZ ${plz})</h4>`;
+  if(roles.includes('tragwerksplaner') && entry.tragwerksplaner){
+    html += `<div class="firm-card"><div class="role">Tragwerksplaner</div><div class="name">${entry.tragwerksplaner.name}</div><a href="${entry.tragwerksplaner.website}" target="_blank" rel="noopener">${entry.tragwerksplaner.website}</a></div>`;
+  }
+  if(roles.includes('architekt') && entry.architekt){
+    html += `<div class="firm-card"><div class="role">Architekt</div><div class="name">${entry.architekt.name}</div><a href="${entry.architekt.website}" target="_blank" rel="noopener">${entry.architekt.website}</a></div>`;
+  }
+  html += `<p class="disclaimer-small">Diese Vorschläge stammen aus einer ersten Online-Recherche für deine Region (nicht die exakte Stadt), erheben keinen Anspruch auf Vollständigkeit oder Eignung fürs konkrete Projekt und sind keine Empfehlung. Bitte Kontakt, Referenzen und Kapazität selbst prüfen.</p></div>`;
+  return html;
+}
+
+function renderKategorien(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="breadcrumb">Start</div>
+    <h2 class="step-title">1. Um welchen Bereich geht es?</h2>
+    <p class="step-sub">Wähle die passende Kategorie – im nächsten Schritt wird es konkreter.</p>
+    <div class="grid cat-grid">
+      ${KATEGORIEN.map(k=>`<div class="card" onclick="location.hash='${k.id}'"><h3>${k.icon} ${k.title}</h3><p>${k.desc}</p></div>`).join('')}
+    </div>`;
+}
+
+function renderMassnahmen(kat){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="breadcrumb"><a onclick="location.hash=''">Start</a><span class="sep">›</span>${kat.title}</div>
+    <h2 class="step-title">2. Welches konkrete Vorhaben ist geplant?</h2>
+    <p class="step-sub">${kat.desc}</p>
+    <div class="grid">
+      ${kat.massnahmen.map(m=>`<div class="card" onclick="location.hash='${kat.id}/${m.id}'"><h3>${m.title}</h3><p>${m.intro}</p></div>`).join('')}
+    </div>`;
+}
+
+function fieldHtml(f){
+  if(f.options){
+    return `<fieldset><legend>${f.label}</legend><select id="dyn-${f.id}">${f.options.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select></fieldset>`;
+  }
+  return `<fieldset><legend>${f.label}</legend><input type="number" id="dyn-${f.id}" min="0" placeholder="${f.placeholder||''}"></fieldset>`;
+}
+
+function renderDetail(kat,m){
+  const app = document.getElementById('app');
+  const hasDynamic = !!m.dynamic;
+  const fields = hasDynamic ? (m.dynamic.fields || [m.dynamic.field]) : [];
+  app.innerHTML = `
+    <div class="breadcrumb"><a onclick="location.hash=''">Start</a><span class="sep">›</span><a onclick="location.hash='${kat.id}'">${kat.title}</a><span class="sep">›</span>${m.title}</div>
+    <div class="detail-panel">
+      <div class="panel-box">
+        <h3>${m.title}</h3>
+        <p class="intro">${m.intro}</p>
+        ${fields.map(fieldHtml).join('')}
+        <button class="primary" id="btn-run">${hasDynamic ? 'Leitfaden erstellen' : 'Leitfaden anzeigen'}</button>
+        <fieldset style="margin-top:18px;">
+          <legend>Postleitzahl deines Standorts (optional)</legend>
+          <div class="plz-row">
+            <input type="text" id="plz-input" maxlength="5" placeholder="z. B. 40210">
+          </div>
+          <p class="hint">Für Vorschläge zu Fachplanern in deiner Region.</p>
+        </fieldset>
+      </div>
+      <div class="panel-box" id="result-box">
+        <h3>Leitfaden</h3>
+        <p class="placeholder">Klicke auf „Leitfaden erstellen", um deine Ersteinschätzung zu sehen.</p>
+      </div>
+    </div>`;
+
+  function run(){
+    const values = {};
+    fields.forEach(f=>{ values[f.id] = document.getElementById('dyn-'+f.id).value; });
+    const blocks = hasDynamic ? m.dynamic.blocks(values) : m.blocks;
+    const plz = document.getElementById('plz-input').value.trim();
+    const fachleuteChips = m.fachleute.length ? m.fachleute.map(f=>`<span class="chip">${f}</span>`).join('') : '<span class="chip">Kein bauvorlageberechtigter Planer nötig</span>';
+    const stepsList = m.nextSteps.map(s=>`<li>${s}</li>`).join('');
+    document.getElementById('result-box').innerHTML = `
+      <h3>Leitfaden: ${m.title}</h3>
+      ${blocks.map(renderBlock).join('')}
+      <div class="result-block"><h4>Wahrscheinlich benötigte Fachleute</h4><div class="chips">${fachleuteChips}</div></div>
+      <div class="result-block"><h4>Empfohlene nächste Schritte</h4><ul class="tasklist">${stepsList}</ul></div>
+      ${renderFachplaner(plz, m.roles)}
+      <p class="disclaimer">Diese Ersteinschätzung basiert auf einer vereinfachten Regellogik, ersetzt keine rechtsverbindliche Prüfung durch Bauamt, Tragwerksplaner oder Fachgutachter und enthält keine statische Berechnung. Vorgaben unterscheiden sich je Bundesland, Kommune und Einzelfall.</p>`;
+  }
+  document.getElementById('btn-run').addEventListener('click', run);
+}
+
+function route(){
+  const hash = location.hash.replace(/^#/,'');
+  if(!hash){ renderKategorien(); return; }
+  const [katId,massId] = hash.split('/');
+  const kat = findKategorie(katId);
+  if(!kat){ renderKategorien(); return; }
+  if(!massId){ renderMassnahmen(kat); return; }
+  const m = findMassnahme(kat,massId);
+  if(!m){ renderMassnahmen(kat); return; }
+  renderDetail(kat,m);
+}
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
