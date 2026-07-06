@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anbau-Check – Schritt für Schritt – Bau-Tools</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --border:#e1e4e9; --text:#1c2430; --muted:#5b6472;
+    --accent:#2a7a5e; --accent-dark:#1f5c46; --accent-light:#e6f3ee;
+    --ok:#1e7a3c; --ok-bg:#e7f5eb; --warn:#9a6400; --warn-bg:#fdf3dc; --risk:#a4222c; --risk-bg:#fbe9ea;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;}
+  header{background:var(--accent);color:#fff;padding:22px 24px 18px;}
+  header h1{margin:0 0 5px;font-size:20px;}
+  header p{margin:0;color:#e2f2ea;font-size:13px;max-width:820px;}
+  a.home-link{color:#e2f2ea;font-size:12.5px;text-decoration:none;}
+  a.home-link:hover{text-decoration:underline;}
+  .wrap{max-width:1020px;margin:0 auto;padding:20px 20px 60px;}
+  .progress{display:flex;gap:6px;margin:0 0 22px;}
+  .p-step{flex:1;text-align:center;font-size:11.5px;color:var(--muted);padding:7px 4px;border-bottom:3px solid var(--border);}
+  .p-step.done{border-color:var(--accent);color:var(--accent-dark);}
+  .p-step.active{border-color:var(--accent);color:var(--accent-dark);font-weight:700;}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;margin-bottom:16px;}
+  h2.step-title{font-size:18px;margin:0 0 6px;}
+  p.step-sub{margin:0 0 18px;color:var(--muted);font-size:13.5px;}
+  fieldset{border:none;padding:0;margin:0 0 15px;}
+  legend{font-weight:600;font-size:13.5px;margin-bottom:5px;padding:0;}
+  select,input[type=text],input[type=number]{width:100%;max-width:420px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13.5px;font-family:inherit;background:#fff;color:var(--text);}
+  .row{display:flex;gap:14px;flex-wrap:wrap;}
+  .row > div{flex:1;min-width:150px;max-width:230px;}
+  .hint{font-size:12px;color:var(--muted);margin:4px 0 0;}
+  .info-box{background:var(--accent-light);border-radius:8px;padding:12px 14px;font-size:13px;margin:12px 0;}
+  .info-box h4{margin:0 0 5px;font-size:13px;color:var(--accent-dark);}
+  .info-box ol{margin:6px 0 0;padding-left:18px;}
+  .info-box li{margin-bottom:4px;}
+  .status-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:8px;}
+  .status-ok{background:var(--ok-bg);color:var(--ok);}
+  .status-warn{background:var(--warn-bg);color:var(--warn);}
+  .status-risk{background:var(--risk-bg);color:var(--risk);}
+  .result-block{border:1px solid var(--border);border-radius:9px;padding:13px 15px;margin-bottom:11px;}
+  .result-block h4{margin:0 0 5px;font-size:14px;}
+  .result-block p{margin:0;font-size:13px;color:#31394a;}
+  .result-block .num{font-weight:700;}
+  button{cursor:pointer;font-family:inherit;}
+  button.primary{background:var(--accent);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:14px;font-weight:600;}
+  button.primary:hover{background:var(--accent-dark);}
+  button.secondary{background:#fff;color:var(--accent-dark);border:1px solid var(--border);padding:10px 18px;border-radius:8px;font-size:14px;font-weight:600;}
+  .nav-row{display:flex;justify-content:space-between;margin-top:20px;}
+  .sketch-box{background:#fafbfc;border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center;}
+  .sketch-box svg{max-width:100%;height:auto;}
+  .err{color:var(--risk);font-size:12.5px;margin-top:6px;}
+  .fachplaner-box{margin-top:14px;background:#fafbfc;border:1px solid var(--border);border-radius:9px;padding:12px 14px;}
+  .fachplaner-box h4{margin:0 0 8px;font-size:13.5px;}
+  .firm-card{border:1px solid var(--border);border-radius:7px;padding:8px 10px;margin-bottom:8px;background:#fff;}
+  .firm-card .role{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:700;}
+  .firm-card .name{font-size:13.5px;font-weight:600;margin:2px 0;}
+  .firm-card a{font-size:12.5px;color:var(--accent);}
+  .disclaimer{font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:16px;padding-top:12px;}
+  .disclaimer-small{font-size:11.5px;color:var(--muted);margin-top:8px;}
+  table.sum{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0;}
+  table.sum td{border-bottom:1px solid var(--border);padding:5px 8px;vertical-align:top;}
+  table.sum td:first-child{color:var(--muted);width:45%;}
+  @media print{
+    header, .progress, .nav-row, .no-print{display:none !important;}
+    body{background:#fff;}
+    .panel{border:none;padding:0;}
+  }
+</style>
+</head>
+<body>
+<header class="no-print">
+  <p style="margin-bottom:8px;"><a class="home-link" href="privat.html">&#8592; Zurück zum privaten Bauvorhaben-Tool</a></p>
+  <h1>Anbau ans Haus – geführter Machbarkeits-Check</h1>
+  <p>Schritt für Schritt vom Bebauungsplan bis zur konkreten Ersteinschätzung deines Anbaus – mit Skizze, Zahlen und einem Dossier für den Fachplaner. Alle Ergebnisse sind Anhaltswerte und müssen von einem Tragwerksplaner/Architekten bestätigt werden.</p>
+</header>
+<div class="wrap">
+  <div class="progress no-print" id="progress"></div>
+  <div id="app"></div>
+</div>
+
+<script>
+const LBO = {
+  'BW':{name:'Baden-Württemberg',abstand:{faktor:0.4,min:2.5,par:'§ 5 LBO BW',hin:'Mindestmaß 2,5 m (bundesweit die Ausnahme neben Hamburg).'},verf:{frei:'§ 51 LBO BW (Kenntnisgabeverfahren)',verein:'§ 52 LBO BW'},geo:{name:'Geoportal Baden-Württemberg',url:'https://www.geoportal-bw.de'}},
+  'BY':{name:'Bayern',abstand:{faktor:0.4,min:3.0,par:'Art. 6 BayBO',hin:'Seit 2021 auf 0,4 H reduziert; Gemeinden können per Satzung abweichen.'},verf:{frei:'Art. 58 BayBO (Genehmigungsfreistellung)',verein:'Art. 59 BayBO'},geo:{name:'BayernAtlas',url:'https://atlas.bayern.de'}},
+  'BE':{name:'Berlin',abstand:{faktor:0.4,min:3.0,par:'§ 6 BauO Bln',hin:''},verf:{frei:'§ 62 BauO Bln (Genehmigungsfreistellung)',verein:'§ 63 BauO Bln'},geo:{name:'Geoportal Berlin',url:'https://gdi.berlin.de'}},
+  'BB':{name:'Brandenburg',abstand:{faktor:0.4,min:3.0,par:'§ 6 BbgBO',hin:''},verf:{frei:'§ 62 BbgBO (Genehmigungsfreistellung)',verein:'§ 63 BbgBO'},geo:{name:'Geoportal Brandenburg',url:'https://geoportal.brandenburg.de'}},
+  'HB':{name:'Bremen',abstand:{faktor:0.4,min:3.0,par:'§ 6 BremLBO',hin:''},verf:{frei:'§ 62 BremLBO (Genehmigungsfreistellung)',verein:'§ 63 BremLBO'},geo:{name:'GeoPortal Bremen',url:'https://geoportal.bremen.de/geoportal/'}},
+  'HH':{name:'Hamburg',abstand:{faktor:0.4,min:2.5,par:'§ 6 HBauO',hin:'Mindestmaß 2,50 m; neue HBauO 2025/26 behält die Werte bei.'},verf:{frei:'§ 62 HBauO n.F. (Genehmigungsfreistellung)',verein:'§ 63 HBauO n.F.'},geo:{name:'Geoportal Hamburg (Geo-Online)',url:'https://geoportal-hamburg.de'}},
+  'HE':{name:'Hessen',abstand:{faktor:0.4,min:3.0,par:'§ 6 HBO',hin:''},verf:{frei:'§ 64 HBO (Genehmigungsfreistellung)',verein:'§ 65 HBO'},geo:{name:'Geoportal Hessen',url:'https://www.geoportal.hessen.de'}},
+  'MV':{name:'Mecklenburg-Vorpommern',abstand:{faktor:0.4,min:3.0,par:'§ 6 LBauO M-V',hin:''},verf:{frei:'§ 62 LBauO M-V (Genehmigungsfreistellung)',verein:'§ 63 LBauO M-V'},geo:{name:'GeoPortal.MV',url:'https://www.geoportal-mv.de'}},
+  'NI':{name:'Niedersachsen',abstand:{faktor:0.5,min:3.0,par:'§ 5 NBauO',hin:'Einziges Land mit Regelabstand 0,5 H.'},verf:{frei:'§ 62 NBauO (Mitteilungsverfahren)',verein:'§ 63 NBauO'},geo:{name:'Geodatenportal Niedersachsen',url:'https://www.geodaten.niedersachsen.de'}},
+  'NW':{name:'Nordrhein-Westfalen',abstand:{faktor:0.4,min:3.0,par:'§ 6 BauO NRW',hin:'2019 von 0,8 H auf 0,4 H reduziert.'},verf:{frei:'§ 63 BauO NRW (Genehmigungsfreistellung)',verein:'§ 64 BauO NRW'},geo:{name:'TIM-online NRW + Bauleitplanung NRW',url:'https://www.tim-online.nrw.de'}},
+  'RP':{name:'Rheinland-Pfalz',abstand:{faktor:0.4,min:3.0,par:'§ 8 LBauO RLP',hin:''},verf:{frei:'§ 67 LBauO RLP (Freistellungsverfahren)',verein:'§ 66 LBauO RLP'},geo:{name:'GeoPortal.rlp',url:'https://www.geoportal.rlp.de'}},
+  'SL':{name:'Saarland',abstand:{faktor:0.4,min:3.0,par:'§ 7 LBO Saarland',hin:''},verf:{frei:'§ 63 LBO SL (Genehmigungsfreistellung)',verein:'§ 64 LBO SL'},geo:{name:'Geoportal Saarland',url:'https://geoportal.saarland.de'}},
+  'SN':{name:'Sachsen',abstand:{faktor:0.4,min:3.0,par:'§ 6 SächsBO',hin:''},verf:{frei:'§ 62 SächsBO (Genehmigungsfreistellung)',verein:'§ 63 SächsBO'},geo:{name:'Geoportal Sachsenatlas',url:'https://geoportal.sachsen.de'}},
+  'ST':{name:'Sachsen-Anhalt',abstand:{faktor:0.4,min:3.0,par:'§ 6 BauO LSA',hin:'Novelle 12/2025 erweitert Genehmigungsfreiheiten.'},verf:{frei:'§ 61 BauO LSA (Genehmigungsfreistellung)',verein:'§ 62 BauO LSA'},geo:{name:'Sachsen-Anhalt-Viewer (LVermGeo)',url:'https://www.lvermgeo.sachsen-anhalt.de/de/startseite_viewer.html'}},
+  'SH':{name:'Schleswig-Holstein',abstand:{faktor:0.4,min:3.0,par:'§ 6 LBO SH',hin:''},verf:{frei:'§ 62 LBO SH (Genehmigungsfreistellung)',verein:'§ 63 LBO SH'},geo:{name:'DigitalerAtlasNord / BOB-SH',url:'https://danord.gdi-sh.de'}},
+  'TH':{name:'Thüringen',abstand:{faktor:0.4,min:3.0,par:'§ 6 ThürBO',hin:''},verf:{frei:'§ 61 ThürBO (Genehmigungsfreistellung)',verein:'§ 62 ThürBO'},geo:{name:'Geoportal Thüringen',url:'https://www.geoportal-th.de'}}
+};
+const FACHPLANER_DB = {
+  '0': {region:'Raum Dresden / Sachsen, Thüringen', tragwerksplaner:{name:'PENZL. Ingenieure Tragwerksplanung GmbH', website:'https://www.penzl-ingenieure.de/'}, architekt:{name:'drauschke & fliegel Architektur', website:'https://www.drauschkefliegel.de/'}},
+  '1': {region:'Raum Berlin / Brandenburg', tragwerksplaner:{name:'LOSSEN INGENIEURE GmbH', website:'https://www.lossen-ingenieure.de/'}, architekt:{name:'AMB-Architekten Machka', website:'https://amb-machka.jimdoweb.com/industriebau/'}},
+  '2': {region:'Raum Hamburg / Schleswig-Holstein, Bremen', tragwerksplaner:{name:'NAi Nagaraj Ingenieure', website:'https://www.nagaraj-ingenieure.de/'}, architekt:{name:'Architekturbüro Herzog & Söchtig', website:'https://www.architekt-hamburg.com/industrie'}},
+  '3': {name:'', region:'Raum Hannover / Niedersachsen', tragwerksplaner:{name:'shl ingenieure GmbH', website:'https://shl-ing.com/'}, architekt:{name:'Architekt Pielhop', website:'http://www.pielhop.de/'}},
+  '4': {region:'Raum Dortmund / Ruhrgebiet', tragwerksplaner:{name:'Cramer Engineering', website:'https://cramer-engineering.de/'}, architekt:{name:'SHA Scheffler Helbich Architekten', website:'https://sha.de/'}},
+  '5': {region:'Raum Köln / Rheinland', tragwerksplaner:{name:'Ingenieurbüro Grobecker GmbH', website:'https://grobecker.koeln/'}, architekt:{name:'frerichsarchitektur', website:'https://frerichsarchitektur.de/'}},
+  '6': {region:'Raum Frankfurt / Hessen', tragwerksplaner:{name:'jmquadrat', website:'https://jmquadrat.de/'}, architekt:{name:'Architekten Michel', website:'https://www.architekten-michel.de/'}},
+  '7': {region:'Raum Stuttgart / Baden-Württemberg', tragwerksplaner:{name:'tragwerk-s', website:'https://www.tragwerk-s.de/'}, architekt:{name:'Neugebauer + Rösch Architekten', website:'https://neugebauer-roesch.pxcld.com/'}},
+  '8': {region:'Raum München / Bayern-Süd', tragwerksplaner:{name:'BERT Ingenieure GmbH & Co. KG', website:'https://bert-ingenieure.de/'}, architekt:{name:'Bottler Lutz Architekten', website:'https://www.bottler-lutz.de/'}},
+  '9': {region:'Raum Nürnberg / Bayern-Nord', tragwerksplaner:{name:'Ingenieurquadrat Part mbB', website:'https://www.ing2.de/'}, architekt:{name:'Wagner + Nenadovic Architekten', website:'http://www.wagner-nenadovic-architekten.de/'}}
+};
+
+/* ---------- State ---------- */
+const S = {
+  step:1,
+  land:'', plz:'',
+  planungsrecht:'', // 'bplan' | 'p34' | 'unklar'
+  grz:'', baugrenzeAbstand:'', baugrenzeUnsicher:'',
+  gW:'', gT:'', hW:'', hT:'', hAL:'', hAV:'', nebenflaeche:'',
+  seite:'links', aB:'', aT:'', aH:'', aO:''
+};
+const STEPS = ['1. Standort','2. Planungsrecht','3. Grundstück','4. Anbau-Skizze','5. Prüfung','6. Dossier'];
+
+function n(v){const x = parseFloat(String(v).replace(',','.')); return isNaN(x)?0:x;}
+function fmt(x){return (Math.round(x*100)/100).toLocaleString('de-DE');}
+
+/* ---------- Geometrie: Anbau-Rechteck & Grenzabstände ---------- */
+function geom(){
+  const gW=n(S.gW), gT=n(S.gT), hW=n(S.hW), hT=n(S.hT), aL=n(S.hAL), aV=n(S.hAV);
+  const b=n(S.aB), t=n(S.aT), o=n(S.aO);
+  // Haus: x von aL..aL+hW, y von aV..aV+hT (y=0 ist Straße/vorne)
+  let ax0,ay0,ax1,ay1;
+  if(S.seite==='links'){ ax0=aL-t; ax1=aL; ay0=aV+o; ay1=aV+o+b; }
+  else if(S.seite==='rechts'){ ax0=aL+hW; ax1=aL+hW+t; ay0=aV+o; ay1=aV+o+b; }
+  else if(S.seite==='hinten'){ ax0=aL+o; ax1=aL+o+b; ay0=aV+hT; ay1=aV+hT+t; }
+  else { ax0=aL+o; ax1=aL+o+b; ay0=aV-t; ay1=aV; } // vorne
+  return {
+    gW,gT,hW,hT,aL,aV,b,t, ax0,ay0,ax1,ay1,
+    dLinks: ax0, dRechts: gW-ax1, dVorne: ay0, dHinten: gT-ay1
+  };
+}
+
+/* ---------- SVG-Skizze ---------- */
+function sketchSVG(){
+  const g = geom();
+  if(g.gW<=0||g.gT<=0||g.hW<=0||g.hT<=0) return '<p class="hint">Skizze erscheint, sobald Grundstück und Haus eingegeben sind.</p>';
+  const pad=46, maxW=560, maxH=420;
+  const sc=Math.min((maxW-2*pad)/g.gW,(maxH-2*pad)/g.gT);
+  const W=g.gW*sc+2*pad, H=g.gT*sc+2*pad;
+  const X=x=>pad+x*sc, Y=y=>H-pad-y*sc; // y=0 (Straße) unten
+  const rect=(x0,y0,x1,y1,fill,stroke,dash)=>`<rect x="${Math.min(X(x0),X(x1))}" y="${Math.min(Y(y0),Y(y1))}" width="${Math.abs(X(x1)-X(x0))}" height="${Math.abs(Y(y1)-Y(y0))}" fill="${fill}" stroke="${stroke}" stroke-width="1.5" ${dash?'stroke-dasharray="5,4"':''}/>`;
+  let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s += rect(0,0,g.gW,g.gT,'#f0f4ef','#8aa392');
+  s += `<text x="${X(g.gW/2)}" y="${H-10}" text-anchor="middle" font-size="11" fill="#5b6472">Straßenseite – Grundstück ${fmt(g.gW)} × ${fmt(g.gT)} m</text>`;
+  s += rect(g.aL,g.aV,g.aL+g.hW,g.aV+g.hT,'#d9e6f2','#4a7096');
+  s += `<text x="${X(g.aL+g.hW/2)}" y="${Y(g.aV+g.hT/2)}" text-anchor="middle" font-size="12" fill="#2c4a68" font-weight="600">Haus</text>`;
+  if(g.b>0&&g.t>0){
+    const bad = g.dLinks<0||g.dRechts<0||g.dVorne<0||g.dHinten<0;
+    s += rect(g.ax0,g.ay0,g.ax1,g.ay1, bad?'#fbe9ea':'#dff0e8', bad?'#a4222c':'#2a7a5e');
+    s += `<text x="${X((g.ax0+g.ax1)/2)}" y="${Y((g.ay0+g.ay1)/2)}" text-anchor="middle" font-size="11" fill="${bad?'#a4222c':'#1f5c46'}" font-weight="600">Anbau</text>`;
+    // Maßlinie zur nächsten Grenze in Anbaurichtung
+    let mx1,my1,mx2,my2,dist;
+    if(S.seite==='links'){ mx1=X(0);my1=Y((g.ay0+g.ay1)/2);mx2=X(g.ax0);my2=my1;dist=g.dLinks; }
+    else if(S.seite==='rechts'){ mx1=X(g.ax1);my1=Y((g.ay0+g.ay1)/2);mx2=X(g.gW);my2=my1;dist=g.dRechts; }
+    else if(S.seite==='hinten'){ mx1=X((g.ax0+g.ax1)/2);my1=Y(g.ay1);mx2=mx1;my2=Y(g.gT);dist=g.dHinten; }
+    else { mx1=X((g.ax0+g.ax1)/2);my1=Y(0);mx2=mx1;my2=Y(g.ay0);dist=g.dVorne; }
+    s += `<line x1="${mx1}" y1="${my1}" x2="${mx2}" y2="${my2}" stroke="#a4222c" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+    s += `<text x="${(mx1+mx2)/2}" y="${(my1+my2)/2 - 6}" text-anchor="middle" font-size="11.5" fill="#a4222c" font-weight="700">${fmt(dist)} m</text>`;
+  }
+  s += '</svg>';
+  return s;
+}
+
+/* ---------- Prüf-Logik ---------- */
+function pruefung(){
+  const g = geom();
+  const lbo = LBO[S.land];
+  const out = [];
+  // 1) Über der Grenze?
+  const minDist = Math.min(g.dLinks,g.dRechts,g.dVorne,g.dHinten);
+  if(minDist < 0){
+    out.push({level:'risk',title:'Anbau ragt über die Grundstücksgrenze', text:`Nach deinen Maßen läge der Anbau ${fmt(-minDist)} m jenseits der Grenze. Maße oder Position anpassen.`});
+  }
+  // 2) Abstandsflächen
+  const erf = Math.max(lbo.abstand.faktor*n(S.aH), lbo.abstand.min);
+  let seiten = [];
+  if(S.seite==='links') seiten=[['zur linken Grenze',g.dLinks],['zur Straßenseite',g.dVorne],['zur hinteren Grenze',g.dHinten]];
+  else if(S.seite==='rechts') seiten=[['zur rechten Grenze',g.dRechts],['zur Straßenseite',g.dVorne],['zur hinteren Grenze',g.dHinten]];
+  else if(S.seite==='hinten') seiten=[['zur hinteren Grenze',g.dHinten],['zur linken Grenze',g.dLinks],['zur rechten Grenze',g.dRechts]];
+  else seiten=[['zur Straßenseite',g.dVorne],['zur linken Grenze',g.dLinks],['zur rechten Grenze',g.dRechts]];
+  const haupt = seiten[0];
+  if(haupt[1] >= 0){
+    if(haupt[1] >= erf) out.push({level:'ok',title:'Abstandsfläche (Hauptrichtung)', text:`Erforderlich nach ${lbo.abstand.par}: ${lbo.abstand.faktor} × ${fmt(n(S.aH))} m Wandhöhe = ${fmt(lbo.abstand.faktor*n(S.aH))} m, mindestens ${fmt(lbo.abstand.min)} m → maßgeblich <span class="num">${fmt(erf)} m</span>. Dein Abstand ${haupt[0]}: <span class="num">${fmt(haupt[1])} m</span>. Eingehalten.`});
+    else out.push({level:'risk',title:'Abstandsfläche verletzt (Hauptrichtung)', text:`Erforderlich nach ${lbo.abstand.par}: <span class="num">${fmt(erf)} m</span> (${lbo.abstand.faktor} × Wandhöhe, min. ${fmt(lbo.abstand.min)} m). Dein Abstand ${haupt[0]}: <span class="num">${fmt(haupt[1])} m</span> – es fehlen ${fmt(erf-haupt[1])} m. Optionen: Anbau schmaler/niedriger planen, Position ändern, oder Abweichung/Nachbarzustimmung prüfen lassen.`});
+  }
+  for(let i=1;i<3;i++){
+    const [label,d]=seiten[i];
+    if(d>=0 && d<erf) out.push({level:'warn',title:'Abstandsfläche seitlich prüfen', text:`Der Abstand ${label} beträgt ${fmt(d)} m und liegt unter dem Regelwert von ${fmt(erf)} m. Ob hier eine Abstandsfläche anfällt, hängt von der Wandgeometrie ab – vom Planer prüfen lassen.`});
+  }
+  // 3) GRZ
+  const A = g.gW*g.gT;
+  const anbauGF = g.b*g.t;
+  const hausGF = g.hW*g.hT;
+  const neben = n(S.nebenflaeche);
+  if(S.planungsrecht==='bplan' && n(S.grz)>0){
+    const grz = n(S.grz);
+    const istHaupt = (hausGF+anbauGF)/A;
+    const kappe = Math.min(grz*1.5, 0.8);
+    const istGesamt = (hausGF+anbauGF+neben)/A;
+    if(istHaupt <= grz) out.push({level:'ok',title:'Grundflächenzahl (GRZ)', text:`Haus + Anbau = ${fmt(hausGF+anbauGF)} m² auf ${fmt(A)} m² Grundstück → GRZ <span class="num">${istHaupt.toFixed(2)}</span> von zulässig <span class="num">${grz.toFixed(2)}</span>. Eingehalten.`});
+    else out.push({level:'risk',title:'GRZ überschritten', text:`Haus + Anbau ergeben GRZ <span class="num">${istHaupt.toFixed(2)}</span>, zulässig sind <span class="num">${grz.toFixed(2)}</span> (§ 19 BauNVO). Der Anbau dürfte höchstens ca. ${fmt(Math.max(0,grz*A-hausGF))} m² Grundfläche haben. Befreiung (§ 31 BauGB) wäre mit der Kommune zu klären.`});
+    if(neben>0){
+      if(istGesamt <= kappe) out.push({level:'ok',title:'GRZ inkl. Nebenanlagen (§ 19 Abs. 4 BauNVO)', text:`Mit Garagen/Nebenanlagen (${fmt(neben)} m²): GRZ ${istGesamt.toFixed(2)} ≤ zulässige Überschreitung bis ${kappe.toFixed(2)} (50-%-Regel, Kappung 0,8).`});
+      else out.push({level:'warn',title:'GRZ inkl. Nebenanlagen überschritten', text:`Mit Nebenanlagen ergibt sich ${istGesamt.toFixed(2)} – über der 50-%-Überschreitungsgrenze von ${kappe.toFixed(2)} (§ 19 Abs. 4 BauNVO). Vom Planer/der Kommune bewerten lassen.`});
+    }
+  } else if(S.planungsrecht==='p34'){
+    out.push({level:'warn',title:'Kein Bebauungsplan – § 34 BauGB', text:`Dein Vorhaben liegt im unbeplanten Innenbereich. Der Anbau (${fmt(anbauGF)} m² Grundfläche) muss sich nach Art, Maß, Bauweise und überbauter Fläche in die nähere Umgebung einfügen – Maßstab ist, was in deiner Nachbarschaft vorhanden ist. Eine Bauvoranfrage bei der Kommune schafft früh Rechtssicherheit.`});
+  } else {
+    out.push({level:'warn',title:'GRZ noch nicht prüfbar', text:'Ohne GRZ-Wert aus dem Bebauungsplan kann die zulässige Ausnutzung nicht berechnet werden. Den Wert im Geoportal nachschlagen (Schritt 2) und hier ergänzen.'});
+  }
+  // 4) Baugrenze
+  if(S.planungsrecht==='bplan'){
+    if(n(S.baugrenzeAbstand)>0){
+      const bg = n(S.baugrenzeAbstand);
+      const d = haupt[1];
+      if(d >= bg) out.push({level:'ok',title:'Baugrenze', text:`Baugrenze liegt lt. deiner Angabe ${fmt(bg)} m von der Grenze entfernt; der Anbau endet bei ${fmt(d)} m → innerhalb des Baufensters.`});
+      else out.push({level:'risk',title:'Baugrenze überschritten', text:`Der Anbau endet ${fmt(d)} m vor der Grenze, die Baugrenze verlangt aber ${fmt(bg)} m (§ 23 Abs. 3 BauNVO: Baugrenzen dürfen nicht überschritten werden). Position/Tiefe anpassen oder Befreiung prüfen.`});
+    } else if(S.baugrenzeUnsicher==='ja'){
+      out.push({level:'ok',title:'Baugrenze', text:'Du hast angegeben, dass der Anbau innerhalb des Baufensters liegt. Vom Planer anhand des B-Plans bestätigen lassen.'});
+    } else {
+      out.push({level:'warn',title:'Baugrenze ungeklärt', text:'Ob der Anbau innerhalb der Baugrenzen liegt, ist noch offen. Im B-Plan (Geoportal, Schritt 2) das Baufenster prüfen.'});
+    }
+  }
+  // 5) Verfahren
+  const lboV = lbo.verf;
+  out.push({level:'warn',title:'Genehmigung & Verfahren', text:`Ein Wohnraum-Anbau ist in ${lbo.name} regelmäßig genehmigungspflichtig. ${S.planungsrecht==='bplan' ? 'Da ein Bebauungsplan existiert, kommt ggf. die '+lboV.frei+' in Frage – dann genügt die Einreichung durch einen bauvorlageberechtigten Planer ohne volles Verfahren.' : 'Üblich ist das vereinfachte Verfahren ('+lboV.verein+').'} Statik (Anschluss an den Bestand, Gründung) ist in jedem Fall durch einen Tragwerksplaner nachzuweisen.`});
+  return out;
+}
+
+/* ---------- Render ---------- */
+function renderProgress(){
+  document.getElementById('progress').innerHTML = STEPS.map((t,i)=>`<div class="p-step ${i+1<S.step?'done':''} ${i+1===S.step?'active':''}">${t}</div>`).join('');
+}
+function badge(l){const c=l==='ok'?'status-ok':l==='warn'?'status-warn':'status-risk';const i=l==='ok'?'✓':l==='warn'?'!':'✕';const t=l==='ok'?'Eingehalten':l==='warn'?'Prüfen':'Kritisch';return `<span class="status-badge ${c}">${i} ${t}</span>`;}
+function block(b){return `<div class="result-block">${badge(b.level)}<h4>${b.title}</h4><p>${b.text}</p></div>`;}
+function nav(back,next,nextLabel){
+  return `<div class="nav-row no-print">${back?'<button class="secondary" onclick="go('+back+')">&#8592; Zurück</button>':'<span></span>'}${next?'<button class="primary" id="btn-next" onclick="go('+next+')">'+(nextLabel||'Weiter &#8594;')+'</button>':''}</div>`;
+}
+function val(id){const e=document.getElementById(id);return e?e.value:'';}
+function saveStep(){
+  const ids={1:['land','plz'],2:['planungsrecht','grz','baugrenzeAbstand','baugrenzeUnsicher'],3:['gW','gT','hW','hT','hAL','hAV','nebenflaeche'],4:['seite','aB','aT','aH','aO']};
+  (ids[S.step]||[]).forEach(k=>{const e=document.getElementById('f-'+k);if(e)S[k]=e.value;});
+}
+function go(step){
+  saveStep();
+  if(step>S.step && !validate()) return;
+  S.step=step; render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function validate(){
+  const err=document.getElementById('step-err');
+  const fail=m=>{if(err){err.textContent=m;}return false;};
+  if(S.step===1 && !S.land) return fail('Bitte wähle dein Bundesland.');
+  if(S.step===2 && !S.planungsrecht) return fail('Bitte wähle aus, ob ein Bebauungsplan existiert.');
+  if(S.step===3 && (n(S.gW)<=0||n(S.gT)<=0||n(S.hW)<=0||n(S.hT)<=0)) return fail('Bitte Grundstücks- und Hausmaße vollständig eingeben.');
+  if(S.step===4 && (n(S.aB)<=0||n(S.aT)<=0||n(S.aH)<=0)) return fail('Bitte Breite, Tiefe und Wandhöhe des Anbaus eingeben.');
+  return true;
+}
+function sel(id,options,cur){return `<select id="${id}">${options.map(o=>`<option value="${o[0]}" ${o[0]===cur?'selected':''}>${o[1]}</option>`).join('')}</select>`;}
+function inp(id,cur,ph){return `<input type="number" step="0.1" min="0" id="${id}" value="${cur}" placeholder="${ph||''}">`;}
+
+function render(){
+  renderProgress();
+  const app=document.getElementById('app');
+  const lbo=LBO[S.land];
+  if(S.step===1){
+    app.innerHTML=`<div class="panel">
+      <h2 class="step-title">Schritt 1 – Wo steht dein Haus?</h2>
+      <p class="step-sub">Die Regeln für Abstände und Verfahren unterscheiden sich je Bundesland – wir laden die passenden Werte.</p>
+      <fieldset><legend>Bundesland</legend>${sel('f-land',[['','– bitte wählen –']].concat(Object.keys(LBO).map(k=>[k,LBO[k].name])),S.land)}</fieldset>
+      <fieldset><legend>Postleitzahl (optional, für Fachplaner-Vorschläge)</legend><input type="text" id="f-plz" maxlength="5" value="${S.plz}" placeholder="z. B. 40210"></fieldset>
+      <div id="lbo-info">${lbo?lboInfo(lbo):''}</div>
+      <p class="err" id="step-err"></p>
+      ${nav(null,2)}
+    </div>`;
+    document.getElementById('f-land').addEventListener('change',e=>{S.land=e.target.value;document.getElementById('lbo-info').innerHTML=S.land?lboInfo(LBO[S.land]):'';});
+  }
+  else if(S.step===2){
+    app.innerHTML=`<div class="panel">
+      <h2 class="step-title">Schritt 2 – Was gilt planungsrechtlich auf deinem Grundstück?</h2>
+      <p class="step-sub">Jetzt ermitteln wir gemeinsam, ob es einen Bebauungsplan gibt und was er festsetzt.</p>
+      <div class="info-box"><h4>So findest du deinen Bebauungsplan (ca. 5–10 Minuten):</h4>
+        <ol>
+          <li>Öffne das Geoportal deines Bundeslands: <a href="${lbo.geo.url}" target="_blank" rel="noopener"><strong>${lbo.geo.name}</strong></a></li>
+          <li>Suche deine Adresse und aktiviere die Kartenebene „Bebauungspläne" / „Bauleitplanung".</li>
+          <li>Liegt dein Grundstück in einem Plangebiet, öffne das Plandokument (PDF) und suche in der Legende nach: <strong>GRZ</strong> (Zahl wie 0,4), <strong>Baugrenze</strong> (blaue gestrichelte Linie) und Zahl der Vollgeschosse.</li>
+          <li>Kein Treffer? Dann liegt dein Grundstück vermutlich im unbeplanten Innenbereich (§ 34 BauGB) – auch dafür rechnen wir weiter.</li>
+        </ol>
+        <p class="hint">Viele Kommunen veröffentlichen B-Pläne zusätzlich auf der eigenen Website („Bebauungsplan + Ortsname" suchen). Im Zweifel gibt das Bauamt telefonisch Auskunft.</p>
+      </div>
+      <fieldset><legend>Gibt es einen Bebauungsplan für dein Grundstück?</legend>
+        ${sel('f-planungsrecht',[['','– bitte wählen –'],['bplan','Ja, es gibt einen Bebauungsplan'],['p34','Nein – unbeplanter Innenbereich (§ 34 BauGB)'],['unklar','Weiß ich noch nicht']],S.planungsrecht)}
+      </fieldset>
+      <div class="row">
+        <div><fieldset><legend>GRZ laut B-Plan (falls vorhanden)</legend>${inp('f-grz',S.grz,'z. B. 0,4')}<p class="hint">Steht im Plan als Zahl, z. B. „GRZ 0,4".</p></fieldset></div>
+        <div><fieldset><legend>Abstand der Baugrenze zur Grundstücksgrenze (m, falls ablesbar)</legend>${inp('f-baugrenzeAbstand',S.baugrenzeAbstand,'z. B. 3')}<p class="hint">Auf der Seite, an der du anbauen willst.</p></fieldset></div>
+        <div><fieldset><legend>Oder: Liegt der Anbau sicher im Baufenster?</legend>${sel('f-baugrenzeUnsicher',[['','– offen –'],['ja','Ja, liegt im Baufenster'],['nein','Unsicher']],S.baugrenzeUnsicher)}</fieldset></div>
+      </div>
+      <p class="err" id="step-err"></p>
+      ${nav(1,3)}
+    </div>`;
+  }
+  else if(S.step===3){
+    app.innerHTML=`<div class="panel">
+      <h2 class="step-title">Schritt 3 – Grundstück und Bestand erfassen</h2>
+      <p class="step-sub">Die Maße findest du im Lageplan, im Kaufvertrag oder direkt im Geoportal (Flurkarte mit Messwerkzeug). Blickrichtung: von der Straße auf dein Grundstück.</p>
+      <div class="row">
+        <div><fieldset><legend>Grundstücksbreite (m)</legend>${inp('f-gW',S.gW,'z. B. 20')}</fieldset></div>
+        <div><fieldset><legend>Grundstückstiefe (m)</legend>${inp('f-gT',S.gT,'z. B. 35')}</fieldset></div>
+        <div><fieldset><legend>Hausbreite (m)</legend>${inp('f-hW',S.hW,'z. B. 10')}</fieldset></div>
+        <div><fieldset><legend>Haustiefe (m)</legend>${inp('f-hT',S.hT,'z. B. 12')}</fieldset></div>
+      </div>
+      <div class="row">
+        <div><fieldset><legend>Abstand Haus → linke Grenze (m)</legend>${inp('f-hAL',S.hAL,'z. B. 4')}</fieldset></div>
+        <div><fieldset><legend>Abstand Haus → Straße/vordere Grenze (m)</legend>${inp('f-hAV',S.hAV,'z. B. 6')}</fieldset></div>
+        <div><fieldset><legend>Grundfläche Garagen/Nebenanlagen (m², optional)</legend>${inp('f-nebenflaeche',S.nebenflaeche,'z. B. 30')}<p class="hint">Zählt bei der GRZ mit (§ 19 Abs. 4 BauNVO).</p></fieldset></div>
+      </div>
+      <p class="err" id="step-err"></p>
+      ${nav(2,4)}
+    </div>`;
+  }
+  else if(S.step===4){
+    app.innerHTML=`<div class="panel">
+      <h2 class="step-title">Schritt 4 – Deinen Anbau skizzieren</h2>
+      <p class="step-sub">Gib die Maße ein – die Skizze und der kritische Grenzabstand aktualisieren sich live.</p>
+      <div class="row">
+        <div><fieldset><legend>An welcher Hausseite?</legend>${sel('f-seite',[['links','Links (von der Straße gesehen)'],['rechts','Rechts'],['hinten','Hinten (Gartenseite)'],['vorne','Vorne (Straßenseite)']],S.seite)}</fieldset></div>
+        <div><fieldset><legend>Breite entlang der Hauswand (m)</legend>${inp('f-aB',S.aB,'z. B. 6')}</fieldset></div>
+        <div><fieldset><legend>Tiefe – wie weit ragt er heraus (m)</legend>${inp('f-aT',S.aT,'z. B. 3,5')}</fieldset></div>
+        <div><fieldset><legend>Wandhöhe des Anbaus (m)</legend>${inp('f-aH',S.aH,'z. B. 3,2')}<p class="hint">Maßgeblich für die Abstandsfläche (${lbo?lbo.abstand.faktor+' × H, min. '+fmt(lbo.abstand.min)+' m':''}).</p></fieldset></div>
+        <div><fieldset><legend>Versatz vom Wandanfang (m, optional)</legend>${inp('f-aO',S.aO,'0')}<p class="hint">0 = beginnt an der Hausecke (bei „hinten": ab linker Hausecke, sonst ab Straßenseite).</p></fieldset></div>
+      </div>
+      <div class="sketch-box" id="sketch">${sketchSVG()}</div>
+      <p class="err" id="step-err"></p>
+      ${nav(3,5,'Jetzt prüfen &#8594;')}
+    </div>`;
+    ['f-seite','f-aB','f-aT','f-aH','f-aO'].forEach(id=>{
+      document.getElementById(id).addEventListener('input',()=>{saveStep();document.getElementById('sketch').innerHTML=sketchSVG();});
+    });
+  }
+  else if(S.step===5){
+    const res=pruefung();
+    const risks=res.filter(r=>r.level==='risk').length;
+    const fazit = risks===0
+      ? {level:'ok',title:'Vorläufiges Fazit: grundsätzlich machbar', text:'Nach deinen Angaben stehen die harten Kriterien (Grenzen, Abstandsflächen'+(n(S.grz)>0?', GRZ':'')+') dem Anbau nicht entgegen. Ein Tragwerksplaner/Architekt muss dieses Ergebnis bestätigen und Statik + Bauantrag übernehmen – das Dossier im nächsten Schritt bereitet genau das vor.'}
+      : {level:'risk',title:'Vorläufiges Fazit: so noch nicht umsetzbar', text:'Mindestens ein hartes Kriterium ist verletzt (rot markiert). Passe im Schritt 4 Maße oder Position an – oft reichen wenige Zentimeter – oder kläre mit Planer/Bauamt eine Abweichung.'};
+    app.innerHTML=`<div class="panel">
+      <h2 class="step-title">Schritt 5 – Automatische Prüfung deines Anbaus</h2>
+      <p class="step-sub">Geprüft nach ${lbo.abstand.par}, § 19/23 BauNVO${S.planungsrecht==='p34'?' und § 34 BauGB':''} – als Ersteinschätzung, nicht als rechtsverbindlicher Nachweis.</p>
+      <div class="sketch-box" style="margin-bottom:14px;">${sketchSVG()}</div>
+      ${block(fazit)}
+      ${res.map(block).join('')}
+      <p class="err" id="step-err"></p>
+      ${nav(4,6,'Dossier erstellen &#8594;')}
+    </div>`;
+  }
+  else if(S.step===6){
+    const res=pruefung();
+    const g=geom();
+    const plz=S.plz.trim();
+    let fp='';
+    if(/^\d{5}$/.test(plz) && FACHPLANER_DB[plz[0]]){
+      const e=FACHPLANER_DB[plz[0]];
+      fp=`<div class="fachplaner-box"><h4>Fachplaner-Vorschläge für ${e.region} (PLZ ${plz})</h4>
+        <div class="firm-card"><div class="role">Tragwerksplaner</div><div class="name">${e.tragwerksplaner.name}</div><a href="${e.tragwerksplaner.website}" target="_blank" rel="noopener">${e.tragwerksplaner.website}</a></div>
+        <div class="firm-card"><div class="role">Architekt</div><div class="name">${e.architekt.name}</div><a href="${e.architekt.website}" target="_blank" rel="noopener">${e.architekt.website}</a></div>
+        <p class="disclaimer-small">Vorschläge aus einer ersten Online-Recherche für deine Region – keine Empfehlung, bitte Referenzen und Kapazität selbst prüfen.</p></div>`;
+    }
+    app.innerHTML=`<div class="panel">
+      <h2 class="step-title">Schritt 6 – Dein Dossier für den Fachplaner</h2>
+      <p class="step-sub">Diese Zusammenfassung kannst du drucken oder als PDF speichern und direkt dem Tragwerksplaner/Architekten übergeben – er muss die Annahmen nur noch verifizieren statt bei Null anzufangen.</p>
+      <h3 style="font-size:15px;margin:0 0 4px;">Projekt: Anbau ans Wohnhaus</h3>
+      <table class="sum">
+        <tr><td>Bundesland / Regelwerk</td><td>${lbo.name} – Abstandsflächen ${lbo.abstand.par} (${lbo.abstand.faktor} × H, min. ${fmt(lbo.abstand.min)} m)</td></tr>
+        <tr><td>Planungsrecht</td><td>${S.planungsrecht==='bplan'?('Bebauungsplan vorhanden'+(n(S.grz)>0?', GRZ '+n(S.grz).toFixed(2):'')):S.planungsrecht==='p34'?'Unbeplanter Innenbereich (§ 34 BauGB)':'Noch ungeklärt'}</td></tr>
+        <tr><td>Grundstück</td><td>${fmt(g.gW)} × ${fmt(g.gT)} m = ${fmt(g.gW*g.gT)} m²</td></tr>
+        <tr><td>Bestandshaus</td><td>${fmt(g.hW)} × ${fmt(g.hT)} m = ${fmt(g.hW*g.hT)} m² Grundfläche</td></tr>
+        <tr><td>Geplanter Anbau</td><td>Seite: ${S.seite} · ${fmt(g.b)} × ${fmt(g.t)} m = ${fmt(g.b*g.t)} m² · Wandhöhe ${fmt(n(S.aH))} m</td></tr>
+        <tr><td>Grenzabstände Anbau (links/rechts/vorne/hinten)</td><td>${fmt(g.dLinks)} / ${fmt(g.dRechts)} / ${fmt(g.dVorne)} / ${fmt(g.dHinten)} m</td></tr>
+      </table>
+      <div class="sketch-box" style="margin:12px 0;">${sketchSVG()}</div>
+      <h3 style="font-size:15px;margin:14px 0 8px;">Prüfergebnisse (Ersteinschätzung)</h3>
+      ${res.map(block).join('')}
+      <h3 style="font-size:15px;margin:14px 0 8px;">Offene Punkte für den Fachplaner</h3>
+      <ul style="font-size:13px;margin:0;padding-left:18px;">
+        <li>Statischer Nachweis: Gründung des Anbaus, Anschluss an den Bestand, ggf. Öffnung der Bestandswand.</li>
+        <li>Verifikation der planungsrechtlichen Annahmen (B-Plan-Festsetzungen, Baugrenzen, GRZ-Berechnung nach § 19 BauNVO).</li>
+        <li>Wärmeschutz (GEG), Abdichtung, Entwässerung des Anbaudachs.</li>
+        <li>Bauantrag bzw. ${S.planungsrecht==='bplan'?lbo.verf.frei:lbo.verf.verein}.</li>
+      </ul>
+      ${fp}
+      <p class="disclaimer">Dieses Dossier ist eine automatisch erzeugte Ersteinschätzung auf Basis deiner Eingaben und vereinfachter Regellogik. Es ersetzt keine rechtsverbindliche Prüfung durch Bauamt, Tragwerksplaner oder Architekt und enthält keine statische Berechnung. Landesrecht, kommunale Satzungen und der konkrete B-Plan gehen immer vor.</p>
+      <div class="nav-row no-print">
+        <button class="secondary" onclick="go(5)">&#8592; Zurück</button>
+        <button class="primary" onclick="window.print()">Dossier drucken / als PDF speichern</button>
+      </div>
+    </div>`;
+  }
+}
+function lboInfo(lbo){
+  return `<div class="info-box"><h4>Für ${lbo.name} gilt:</h4>
+    Abstandsflächen: <strong>${lbo.abstand.faktor} × Wandhöhe</strong>, mindestens <strong>${fmt(lbo.abstand.min)} m</strong> (${lbo.abstand.par}). ${lbo.abstand.hin||''}<br>
+    B-Plan-Auskunft: <a href="${lbo.geo.url}" target="_blank" rel="noopener">${lbo.geo.name}</a></div>`;
+}
+render();
+</script>
+</body>
+</html>
